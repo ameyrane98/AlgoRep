@@ -124,6 +124,10 @@ export default {
             ignore,
           },
         },
+        {
+          from: 'data',
+          to: 'data',
+        },
       ],
     }),
     new FileManagerPlugin({

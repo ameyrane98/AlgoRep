@@ -11,6 +11,15 @@ import {
   mergeStats,
 } from './util.js';
 import { appendProblemToReadme, sortTopicsInReadme } from './readmeTopics.js';
+import {
+  saveSubmissionRecord,
+  getSubmissionHistory,
+  updateStreakData,
+  updateTopicStats,
+  buildSolutionsTable,
+} from './submissionHistory.js';
+import { scheduleProblemForReview } from './spacedRepetition.js';
+import { analyzeSubmission, formatAnalysisMarkdown, saveAnalysis } from './aiAnalysis.js';
 
 /* Commit messages */
 const readmeMsg = 'Create README - LeetHub';
@@ -30,6 +39,10 @@ const EXPLORE_SECTION_PROBLEM = 1;
 const WAIT_FOR_GITHUB_API_TO_NOT_THROW_409_MS = 500;
 
 const api = getBrowser();
+
+// Attempt counter and solve timer state
+let submitAttemptCount = 0;
+let problemPageLoadTime = Date.now();
 
 /**
  * Constructs a file path by appending the given filename to the problem directory.
@@ -425,9 +438,31 @@ async function updateReadmeTopicTagsWithProblem(topicTags, problemName) {
   );
 }
 
+/**
+ * Finds the next available version number for a same-language re-submission.
+ * Checks stats.shas for existing versioned files like "0001-two-sum-v1.py", "0001-two-sum-v2.py".
+ * @param {Object} shas - The shas object for the problem's fullPath
+ * @param {string} problemName - The problem slug
+ * @param {string} language - The language extension (e.g. ".py")
+ * @returns {number} The next version number (1 if no versions exist yet)
+ */
+function getNextVersionNumber(shas, problemName, language) {
+  let maxVersion = 0;
+  for (const file of Object.keys(shas || {})) {
+    const versionMatch = file.match(new RegExp(`^${problemName}-v(\\d+)\\${language}$`));
+    if (versionMatch) {
+      maxVersion = Math.max(maxVersion, parseInt(versionMatch[1], 10));
+    }
+  }
+  return maxVersion + 1;
+}
+
 /** @param {LeetCodeV1 | LeetCodeV2} leetCode */
 function loader(leetCode) {
   let iterations = 0;
+  const solveStartTime = problemPageLoadTime;
+  const attempts = submitAttemptCount;
+
   const intervalId = setInterval(async () => {
     try {
       const isSuccessfulSubmission = leetCode.getSuccessStateAndUpdate();
@@ -443,6 +478,9 @@ function loader(leetCode) {
 
       // If successful, stop polling
       clearInterval(intervalId);
+
+      // Calculate solve time
+      const solveTimeMs = Date.now() - solveStartTime;
 
       // For v2, query LeetCode API for submission results
       await leetCode.init();
@@ -478,10 +516,49 @@ function loader(leetCode) {
         throw new LeetHubError('LanguageNotFound');
       }
       const filename = problemName + language;
+      const fullPath = `${groupName}/${primaryTopic}/${problemName}`;
+
+      // --- Multi-Solution Versioning ---
+      // If the same problem+language file already exists, archive the old version
+      let archiveOldVersion;
+      if (alreadyCompleted) {
+        const { stats } = await api.storage.local.get('stats');
+        const existingSha = stats?.shas?.[fullPath]?.[filename];
+        if (existingSha) {
+          const { leethub_token, leethub_hook } = await api.storage.local.get([
+            'leethub_token',
+            'leethub_hook',
+          ]);
+          try {
+            // Fetch the old code from GitHub
+            const oldFileData = await getGitHubFile(
+              leethub_token,
+              leethub_hook,
+              fullPath,
+              filename
+            ).then(res => res.json());
+
+            // Determine the next version number
+            const nextVersion = getNextVersionNumber(stats.shas[fullPath], problemName, language);
+            const versionedFilename = `${problemName}-v${nextVersion}${language}`;
+
+            // Upload the old code as a versioned file
+            archiveOldVersion = uploadGitWith409Retry(
+              oldFileData.content, // already base64 encoded from GitHub
+              groupName,
+              primaryTopic,
+              problemName,
+              versionedFilename,
+              `Archive previous solution as ${versionedFilename}`
+            );
+          } catch (e) {
+            console.log('Could not archive old version:', e);
+          }
+        }
+      }
 
       /* Upload README */
       const uploadReadMe = await api.storage.local.get('stats').then(({ stats }) => {
-        const fullPath = `${groupName}/${primaryTopic}/${problemName}`;
         const shaExists = stats?.shas?.[fullPath]?.[readmeFilename] !== undefined;
 
         if (!shaExists) {
@@ -527,7 +604,111 @@ function loader(leetCode) {
         problemName
       );
 
-      const newSHAs = await Promise.all([uploadReadMe, uploadNotes, uploadCode, updateRepoReadMe]);
+      // Wait for archive to finish before main uploads (to avoid SHA conflicts)
+      if (archiveOldVersion) {
+        await archiveOldVersion;
+        await delay(() => {}, WAIT_FOR_GITHUB_API_TO_NOT_THROW_409_MS);
+      }
+
+      await Promise.all([uploadReadMe, uploadNotes, uploadCode, updateRepoReadMe]);
+
+      // --- Save Rich Submission History ---
+      const languageName =
+        leetCode.submissionData?.lang?.verboseName || leetCode.submissionData?.lang?.name || null;
+      const submissionRecord = await saveSubmissionRecord(problemName, leetCode.submissionData, {
+        difficulty: leetCode.difficulty,
+        language,
+        languageName,
+        groupName,
+        primaryTopic,
+        attempts,
+        solveTimeMs,
+      });
+
+      // --- AI Analysis (runs async, updates README when done) ---
+      const aiAnalysisPromise = (async () => {
+        try {
+          const analysis = await analyzeSubmission({
+            code,
+            title: leetCode.submissionData?.question?.title,
+            difficulty: leetCode.difficulty,
+            language: languageName,
+          });
+
+          if (analysis) {
+            await saveAnalysis(problemName, analysis);
+            console.log('LeetHub AI Analysis:', analysis);
+
+            // Build enriched README with AI analysis + solutions history
+            let enrichedReadme = probStatement;
+            enrichedReadme += formatAnalysisMarkdown(analysis);
+
+            const history = await getSubmissionHistory(problemName);
+            if (history.length > 1) {
+              enrichedReadme += buildSolutionsTable(history);
+            }
+
+            await delay(
+              () =>
+                uploadGitWith409Retry(
+                  encode(enrichedReadme),
+                  groupName,
+                  primaryTopic,
+                  problemName,
+                  readmeFilename,
+                  'Update README with AI analysis - LeetHub'
+                ),
+              WAIT_FOR_GITHUB_API_TO_NOT_THROW_409_MS
+            );
+          }
+        } catch (e) {
+          console.log('LeetHub AI: Analysis failed (non-blocking):', e.message);
+        }
+      })();
+
+      // --- Update Solutions Table in README (for re-solves, only if no AI analysis) ---
+      if (alreadyCompleted) {
+        const history = await getSubmissionHistory(problemName);
+        if (history.length > 1) {
+          // Only update with plain solutions table if AI analysis won't do it
+          aiAnalysisPromise.then(async () => {
+            // Check if AI already updated the README
+            const { aiAnalysis = {} } = await api.storage.local.get('aiAnalysis');
+            if (aiAnalysis[problemName]) return; // AI already handled it
+
+            const solutionsTable = buildSolutionsTable(history);
+            const readmeWithTable = probStatement + solutionsTable;
+            try {
+              await delay(
+                () =>
+                  uploadGitWith409Retry(
+                    encode(readmeWithTable),
+                    groupName,
+                    primaryTopic,
+                    problemName,
+                    readmeFilename,
+                    'Update README with solutions history'
+                  ),
+                WAIT_FOR_GITHUB_API_TO_NOT_THROW_409_MS
+              );
+            } catch (e) {
+              console.log('Could not update README with solutions table:', e);
+            }
+          });
+        }
+      }
+
+      // --- Update Streak, Topic Stats, and Spaced Repetition ---
+      updateStreakData().catch(e => console.log('Could not update streak:', e));
+      updateTopicStats(topicTags, problemName).catch(e =>
+        console.log('Could not update topic stats:', e)
+      );
+      scheduleProblemForReview(problemName, {
+        title: leetCode.submissionData?.question?.title,
+        difficulty: leetCode.difficulty,
+        titleSlug: leetCode.submissionData?.question?.titleSlug,
+        topicTags: topicTags.map(t => t.name),
+      }).catch(e => console.log('Could not schedule for review:', e));
 
       leetCode.markUploaded();
 
@@ -535,6 +716,9 @@ function loader(leetCode) {
         // Increments local and persistent stats
         incrementStats(leetCode.difficulty, problemName).then(setPersistentStats);
       }
+
+      // Reset attempt counter for next problem
+      submitAttemptCount = 0;
     } catch (err) {
       leetCode.markUploadFailed();
       clearInterval(intervalId);
@@ -585,6 +769,9 @@ async function v2SubmissionHandler(event, leetCode) {
     return;
   }
 
+  // Track submission attempts
+  submitAttemptCount++;
+
   const authenticated =
     !isEmptyObject(await api.storage.local.get(['leethub_token'])) &&
     !isEmptyObject(await api.storage.local.get(['leethub_hook']));
@@ -621,7 +808,10 @@ const submitBtnObserver = new MutationObserver(function (_mutations, observer) {
     observer.disconnect();
 
     const leetCode = new LeetCodeV1();
-    v1SubmitBtn.addEventListener('click', () => loader(leetCode));
+    v1SubmitBtn.addEventListener('click', () => {
+      submitAttemptCount++;
+      loader(leetCode);
+    });
     return;
   }
 
@@ -665,6 +855,21 @@ api.storage.local.get('isSync', data => {
   }
 });
 
+// Reset attempt counter and solve timer on problem page navigation
+let lastProblemUrl = window.location.pathname;
+const navigationObserver = new MutationObserver(() => {
+  const currentUrl = window.location.pathname;
+  if (currentUrl !== lastProblemUrl) {
+    lastProblemUrl = currentUrl;
+    // Reset if navigating to a new problem (URL contains /problems/)
+    if (currentUrl.includes('/problems/')) {
+      submitAttemptCount = 0;
+      problemPageLoadTime = Date.now();
+    }
+  }
+});
+navigationObserver.observe(document.body, { childList: true, subtree: true });
+
 setupManualSubmitBtn(
   debounce(
     () => {
@@ -679,6 +884,67 @@ setupManualSubmitBtn(
     true
   )
 );
+
+// --- In-Page Problem Status Badges ---
+// Injects green checkmarks next to problems that have been synced to GitHub
+function injectProblemBadges() {
+  api.storage.local.get('stats', ({ stats }) => {
+    if (!stats?.shas) return;
+
+    // Build a set of solved problem slugs from stats.shas keys
+    const solvedSlugs = new Set();
+    for (const fullPath of Object.keys(stats.shas)) {
+      const slug = fullPath.split('/').pop();
+      if (slug) solvedSlugs.add(slug);
+    }
+
+    if (solvedSlugs.size === 0) return;
+
+    // Find all problem links on the page
+    const links = document.querySelectorAll('a[href*="/problems/"]');
+    for (const link of links) {
+      // Skip already-badged links
+      if (link.querySelector('.leethub-synced-badge')) continue;
+
+      const match = link.href.match(/\/problems\/([^/]+)/);
+      if (!match) continue;
+
+      const titleSlug = match[1];
+
+      // Check if any solved slug ends with this titleSlug
+      const isSolved = [...solvedSlugs].some(slug => slug.endsWith(titleSlug));
+
+      if (isSolved) {
+        const badge = document.createElement('span');
+        badge.className = 'leethub-synced-badge';
+        badge.title = 'Synced to GitHub via LeetHub';
+        badge.style.cssText =
+          'display:inline-block;margin-left:4px;color:#5cb85c;font-size:12px;vertical-align:middle;';
+        badge.textContent = '\u2713'; // checkmark
+        link.appendChild(badge);
+      }
+    }
+  });
+}
+
+// Inject badges whenever the page content changes (SPA navigation)
+const badgeObserver = new MutationObserver(
+  debounce(() => {
+    if (
+      window.location.pathname.includes('/problemset/') ||
+      window.location.pathname.includes('/problem-list/') ||
+      window.location.pathname.includes('/tag/') ||
+      window.location.pathname.includes('/study-plan/') ||
+      window.location.pathname === '/'
+    ) {
+      injectProblemBadges();
+    }
+  }, 500)
+);
+badgeObserver.observe(document.body, { childList: true, subtree: true });
+
+// Initial injection
+injectProblemBadges();
 
 class LeetHubNetworkError extends LeetHubError {
   constructor(response) {

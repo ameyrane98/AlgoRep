@@ -47,15 +47,91 @@
         <!-- Commit mode -->
         <div id="commit_mode" hidden>
           <p id="repo_url" class="ui small header"></p>
-          <p class="onboarding">Problems Solved: <span id="p_solved">0</span></p>
-          <p class="ui small header">
-            <span style="color: #5cb85c">Easy:</span>
-            <span id="p_solved_easy" style="color: #000000; opacity: 0.75">0 </span>
-            <span style="color: #f0ad4e">&ensp; &ensp; Medium:</span>
-            <span id="p_solved_medium" style="color: #000000; opacity: 0.75">0 </span>
-            <span style="color: #d9534f">&ensp; &ensp; Hard:</span>
-            <span id="p_solved_hard" style="color: #000000; opacity: 0.75">0 </span>
-          </p>
+
+          <!-- Streak Section -->
+          <div id="streak_section" class="popup-section">
+            <span id="streak_display" class="streak-badge">
+              <span class="streak-flame">&#x1F525;</span>
+              <span id="current_streak">0</span> day streak
+            </span>
+            <span class="streak-best">(best: <span id="longest_streak">0</span>)</span>
+          </div>
+
+          <!-- Stats Section -->
+          <div class="popup-section">
+            <p class="onboarding">Problems Solved: <span id="p_solved">0</span></p>
+            <p class="ui small header">
+              <span style="color: #5cb85c">Easy:</span>
+              <span id="p_solved_easy" style="color: #000000; opacity: 0.75">0 </span>
+              <span style="color: #f0ad4e">&ensp; &ensp; Medium:</span>
+              <span id="p_solved_medium" style="color: #000000; opacity: 0.75">0 </span>
+              <span style="color: #d9534f">&ensp; &ensp; Hard:</span>
+              <span id="p_solved_hard" style="color: #000000; opacity: 0.75">0 </span>
+            </p>
+          </div>
+
+          <!-- Review Queue Section -->
+          <div id="review_section" class="popup-section" hidden>
+            <div class="section-header">
+              <span class="section-title">Review Due</span>
+              <span id="review_count" class="review-badge">0</span>
+            </div>
+            <div id="review_list" class="review-list"></div>
+          </div>
+
+          <!-- Topic Mastery Section -->
+          <div id="topics_section" class="popup-section" hidden>
+            <div class="section-header">
+              <span class="section-title">Topic Progress</span>
+            </div>
+            <div id="topics_list" class="topics-list"></div>
+          </div>
+
+          <!-- Study Plan Section -->
+          <div id="study_plan_section" class="popup-section" hidden>
+            <div class="section-header">
+              <span class="section-title">Study Plan</span>
+              <select id="study_plan_select" class="plan-select">
+                <option value="blind75">Blind 75</option>
+                <option value="neetcode150">NeetCode 150</option>
+                <option value="grind75">Grind 75</option>
+              </select>
+            </div>
+            <div id="study_plan_progress" class="plan-progress">
+              <div class="plan-progress-bar">
+                <div id="plan_progress_fill" class="plan-progress-fill"></div>
+              </div>
+              <span id="plan_progress_text" class="plan-progress-text">0/0</span>
+            </div>
+            <div id="plan_next_problem" class="plan-next"></div>
+          </div>
+
+          <!-- AI Settings Section -->
+          <div id="ai_section" class="popup-section">
+            <div class="section-header">
+              <span class="section-title">AI Analysis</span>
+              <span id="ai_status" class="ai-status"></span>
+            </div>
+            <div id="ai_settings" class="ai-settings">
+              <div class="ai-info" id="ai_chrome_info">
+                Uses Chrome Built-in AI (free, on-device)
+              </div>
+              <div class="ai-fallback">
+                <details>
+                  <summary class="ai-fallback-toggle">Optional: API Key</summary>
+                  <div class="ai-key-form">
+                    <select id="ai_provider" class="plan-select" style="width:100%;margin-bottom:4px;">
+                      <option value="gemini">Gemini (free tier)</option>
+                      <option value="openai">OpenAI</option>
+                    </select>
+                    <input id="ai_key" type="password" placeholder="API key (optional)" class="ai-key-input" />
+                    <button id="ai_save_key" type="button" class="ai-save-btn">Save</button>
+                  </div>
+                </details>
+              </div>
+            </div>
+          </div>
+
           <button id="reset_stats" type="button">Reset all stats</button>
           <div id="reset_confirmation" style="position:absolute; display:none; top:200px; left:50%; width:500px; margin-left:-250px; border:1px solid blue; padding:20px; background-color:white;">
             <p>Are you sure you want to delete your stats?</p>

@@ -33,3 +33,266 @@ body {
   padding-top: 2%;
   font-size: medium;
 }
+
+/* --- New Feature Styles --- */
+
+.popup-section {
+  margin: 8px 0;
+  text-align: center;
+}
+
+/* Streak */
+.streak-badge {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+.streak-flame {
+  font-size: 18px;
+}
+
+.streak-best {
+  font-size: 11px;
+  color: #888;
+  margin-left: 4px;
+}
+
+/* Section Headers */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  border-top: 1px solid #ccc;
+  margin-top: 4px;
+}
+
+.section-title {
+  font-weight: bold;
+  font-size: 13px;
+  color: #333;
+}
+
+/* Review Queue */
+.review-badge {
+  background: #d9534f;
+  color: white;
+  border-radius: 10px;
+  padding: 1px 8px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.review-list {
+  max-height: 120px;
+  overflow-y: auto;
+  text-align: left;
+  padding: 4px 0;
+}
+
+.review-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 4px;
+  border-bottom: 1px solid #eee;
+  font-size: 11px;
+}
+
+.review-item:last-child {
+  border-bottom: none;
+}
+
+.review-item a {
+  color: #1a73e8;
+  text-decoration: none;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.review-item a:hover {
+  text-decoration: underline;
+}
+
+.review-difficulty {
+  font-size: 10px;
+  font-weight: bold;
+  margin-left: 6px;
+  flex-shrink: 0;
+}
+
+.review-difficulty.easy { color: #5cb85c; }
+.review-difficulty.medium { color: #f0ad4e; }
+.review-difficulty.hard { color: #d9534f; }
+
+/* Topic Mastery */
+.topics-list {
+  max-height: 150px;
+  overflow-y: auto;
+  text-align: left;
+  padding: 4px 0;
+}
+
+.topic-row {
+  display: flex;
+  align-items: center;
+  padding: 2px 0;
+  font-size: 11px;
+}
+
+.topic-name {
+  width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #333;
+}
+
+.topic-bar-container {
+  flex: 1;
+  height: 10px;
+  background: #e0e0e0;
+  border-radius: 5px;
+  margin: 0 6px;
+  overflow: hidden;
+}
+
+.topic-bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.3s ease;
+}
+
+.topic-count {
+  width: 28px;
+  text-align: right;
+  font-size: 10px;
+  color: #666;
+  flex-shrink: 0;
+}
+
+/* Study Plan */
+.plan-select {
+  font-size: 11px;
+  padding: 1px 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: white;
+  color: #333;
+}
+
+.plan-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+}
+
+.plan-progress-bar {
+  flex: 1;
+  height: 12px;
+  background: #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.plan-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #5cb85c, #4cae4c);
+  border-radius: 6px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+.plan-progress-text {
+  font-size: 12px;
+  font-weight: bold;
+  color: #333;
+  white-space: nowrap;
+}
+
+.plan-next {
+  font-size: 11px;
+  color: #555;
+  text-align: left;
+  padding: 2px 0;
+}
+
+.plan-next a {
+  color: #1a73e8;
+  text-decoration: none;
+}
+
+.plan-next a:hover {
+  text-decoration: underline;
+}
+
+/* AI Settings */
+.ai-status {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.ai-status.active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.ai-status.inactive {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.ai-info {
+  font-size: 11px;
+  color: #555;
+  padding: 4px 0;
+}
+
+.ai-fallback {
+  margin-top: 4px;
+}
+
+.ai-fallback-toggle {
+  font-size: 11px;
+  color: #888;
+  cursor: pointer;
+}
+
+.ai-fallback-toggle:hover {
+  color: #555;
+}
+
+.ai-key-form {
+  padding: 6px 0;
+  text-align: left;
+}
+
+.ai-key-input {
+  width: 100%;
+  font-size: 11px;
+  padding: 4px 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin-bottom: 4px;
+}
+
+.ai-save-btn {
+  font-size: 11px;
+  padding: 3px 12px;
+  background: #5cb85c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ai-save-btn:hover {
+  background: #4cae4c;
+}

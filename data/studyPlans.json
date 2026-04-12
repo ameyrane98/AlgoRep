@@ -1,0 +1,377 @@
+{
+  "blind75": {
+    "name": "Blind 75",
+    "description": "75 essential LeetCode problems curated by Blind",
+    "problems": {
+      "Array": [
+        "0001-two-sum",
+        "0121-best-time-to-buy-and-sell-stock",
+        "0217-contains-duplicate",
+        "0238-product-of-array-except-self",
+        "0053-maximum-subarray",
+        "0152-maximum-product-subarray",
+        "0153-find-minimum-in-rotated-sorted-array",
+        "0033-search-in-rotated-sorted-array",
+        "0015-3sum",
+        "0011-container-with-most-water"
+      ],
+      "Binary": [
+        "0371-sum-of-two-integers",
+        "0191-number-of-1-bits",
+        "0338-counting-bits",
+        "0268-missing-number",
+        "0190-reverse-bits"
+      ],
+      "Dynamic Programming": [
+        "0070-climbing-stairs",
+        "0322-coin-change",
+        "0300-longest-increasing-subsequence",
+        "1143-longest-common-subsequence",
+        "0139-word-break",
+        "0039-combination-sum",
+        "0198-house-robber",
+        "0213-house-robber-ii",
+        "0091-decode-ways",
+        "0062-unique-paths",
+        "0055-jump-game"
+      ],
+      "Graph": [
+        "0133-clone-graph",
+        "0207-course-schedule",
+        "0417-pacific-atlantic-water-flow",
+        "0200-number-of-islands",
+        "0128-longest-consecutive-sequence",
+        "0269-alien-dictionary",
+        "0261-graph-valid-tree",
+        "0323-number-of-connected-components-in-an-undirected-graph"
+      ],
+      "Interval": [
+        "0057-insert-interval",
+        "0056-merge-intervals",
+        "0435-non-overlapping-intervals",
+        "0252-meeting-rooms",
+        "0253-meeting-rooms-ii"
+      ],
+      "Linked List": [
+        "0206-reverse-linked-list",
+        "0141-linked-list-cycle",
+        "0021-merge-two-sorted-lists",
+        "0023-merge-k-sorted-lists",
+        "0019-remove-nth-node-from-end-of-list",
+        "0143-reorder-list"
+      ],
+      "Matrix": [
+        "0073-set-matrix-zeroes",
+        "0054-spiral-matrix",
+        "0048-rotate-image",
+        "0079-word-search"
+      ],
+      "String": [
+        "0003-longest-substring-without-repeating-characters",
+        "0424-longest-repeating-character-replacement",
+        "0076-minimum-window-substring",
+        "0242-valid-anagram",
+        "0049-group-anagrams",
+        "0020-valid-parentheses",
+        "0125-valid-palindrome",
+        "0005-longest-palindromic-substring",
+        "0647-palindromic-substrings",
+        "0271-encode-and-decode-strings"
+      ],
+      "Tree": [
+        "0104-maximum-depth-of-binary-tree",
+        "0100-same-tree",
+        "0226-invert-binary-tree",
+        "0124-binary-tree-maximum-path-sum",
+        "0102-binary-tree-level-order-traversal",
+        "0297-serialize-and-deserialize-binary-tree",
+        "0572-subtree-of-another-tree",
+        "0105-construct-binary-tree-from-preorder-and-inorder-traversal",
+        "0098-validate-binary-search-tree",
+        "0230-kth-smallest-element-in-a-bst",
+        "0235-lowest-common-ancestor-of-a-binary-search-tree",
+        "0208-implement-trie-prefix-tree",
+        "0211-design-add-and-search-words-data-structure",
+        "0212-word-search-ii"
+      ],
+      "Heap": [
+        "0023-merge-k-sorted-lists",
+        "0347-top-k-frequent-elements",
+        "0295-find-median-from-data-stream"
+      ]
+    }
+  },
+  "neetcode150": {
+    "name": "NeetCode 150",
+    "description": "150 problems curated by NeetCode for coding interviews",
+    "problems": {
+      "Arrays & Hashing": [
+        "0217-contains-duplicate",
+        "0242-valid-anagram",
+        "0001-two-sum",
+        "0049-group-anagrams",
+        "0347-top-k-frequent-elements",
+        "0238-product-of-array-except-self",
+        "0036-valid-sudoku",
+        "0271-encode-and-decode-strings",
+        "0128-longest-consecutive-sequence"
+      ],
+      "Two Pointers": [
+        "0125-valid-palindrome",
+        "0167-two-sum-ii-input-array-is-sorted",
+        "0015-3sum",
+        "0011-container-with-most-water",
+        "0042-trapping-rain-water"
+      ],
+      "Sliding Window": [
+        "0121-best-time-to-buy-and-sell-stock",
+        "0003-longest-substring-without-repeating-characters",
+        "0424-longest-repeating-character-replacement",
+        "0567-permutation-in-string",
+        "0076-minimum-window-substring",
+        "0239-sliding-window-maximum"
+      ],
+      "Stack": [
+        "0020-valid-parentheses",
+        "0155-min-stack",
+        "0150-evaluate-reverse-polish-notation",
+        "0022-generate-parentheses",
+        "0739-daily-temperatures",
+        "0853-car-fleet",
+        "0084-largest-rectangle-in-histogram"
+      ],
+      "Binary Search": [
+        "0704-binary-search",
+        "0074-search-a-2d-matrix",
+        "0875-koko-eating-bananas",
+        "0153-find-minimum-in-rotated-sorted-array",
+        "0033-search-in-rotated-sorted-array",
+        "0981-time-based-key-value-store",
+        "0004-median-of-two-sorted-arrays"
+      ],
+      "Linked List": [
+        "0206-reverse-linked-list",
+        "0021-merge-two-sorted-lists",
+        "0143-reorder-list",
+        "0019-remove-nth-node-from-end-of-list",
+        "0138-copy-list-with-random-pointer",
+        "0002-add-two-numbers",
+        "0141-linked-list-cycle",
+        "0287-find-the-duplicate-number",
+        "0146-lru-cache",
+        "0023-merge-k-sorted-lists",
+        "0025-reverse-nodes-in-k-group"
+      ],
+      "Trees": [
+        "0226-invert-binary-tree",
+        "0104-maximum-depth-of-binary-tree",
+        "0543-diameter-of-binary-tree",
+        "0110-balanced-binary-tree",
+        "0100-same-tree",
+        "0572-subtree-of-another-tree",
+        "0235-lowest-common-ancestor-of-a-binary-search-tree",
+        "0102-binary-tree-level-order-traversal",
+        "0199-binary-tree-right-side-view",
+        "1448-count-good-nodes-in-binary-tree",
+        "0098-validate-binary-search-tree",
+        "0230-kth-smallest-element-in-a-bst",
+        "0105-construct-binary-tree-from-preorder-and-inorder-traversal",
+        "0124-binary-tree-maximum-path-sum",
+        "0297-serialize-and-deserialize-binary-tree"
+      ],
+      "Tries": [
+        "0208-implement-trie-prefix-tree",
+        "0211-design-add-and-search-words-data-structure",
+        "0212-word-search-ii"
+      ],
+      "Heap / Priority Queue": [
+        "0703-kth-largest-element-in-a-stream",
+        "1046-last-stone-weight",
+        "0973-k-closest-points-to-origin",
+        "0215-kth-largest-element-in-an-array",
+        "0621-task-scheduler",
+        "0355-design-twitter",
+        "0295-find-median-from-data-stream"
+      ],
+      "Backtracking": [
+        "0078-subsets",
+        "0039-combination-sum",
+        "0046-permutations",
+        "0090-subsets-ii",
+        "0040-combination-sum-ii",
+        "0079-word-search",
+        "0131-palindrome-partitioning",
+        "0017-letter-combinations-of-a-phone-number",
+        "0051-n-queens"
+      ],
+      "Graphs": [
+        "0200-number-of-islands",
+        "0133-clone-graph",
+        "0695-max-area-of-island",
+        "0417-pacific-atlantic-water-flow",
+        "0130-surrounded-regions",
+        "0994-rotting-oranges",
+        "0286-walls-and-gates",
+        "0207-course-schedule",
+        "0210-course-schedule-ii",
+        "0684-redundant-connection",
+        "0323-number-of-connected-components-in-an-undirected-graph",
+        "0261-graph-valid-tree",
+        "0127-word-ladder"
+      ],
+      "Advanced Graphs": [
+        "0332-reconstruct-itinerary",
+        "1584-min-cost-to-connect-all-points",
+        "0743-network-delay-time",
+        "0787-cheapest-flights-within-k-stops",
+        "0269-alien-dictionary"
+      ],
+      "1-D Dynamic Programming": [
+        "0070-climbing-stairs",
+        "0746-min-cost-climbing-stairs",
+        "0198-house-robber",
+        "0213-house-robber-ii",
+        "0005-longest-palindromic-substring",
+        "0647-palindromic-substrings",
+        "0091-decode-ways",
+        "0322-coin-change",
+        "0152-maximum-product-subarray",
+        "0139-word-break",
+        "0300-longest-increasing-subsequence",
+        "0416-partition-equal-subset-sum"
+      ],
+      "2-D Dynamic Programming": [
+        "0062-unique-paths",
+        "1143-longest-common-subsequence",
+        "0309-best-time-to-buy-and-sell-stock-with-cooldown",
+        "0518-coin-change-ii",
+        "0494-target-sum",
+        "0097-interleaving-string",
+        "0072-edit-distance",
+        "0312-burst-balloons",
+        "0010-regular-expression-matching"
+      ],
+      "Greedy": [
+        "0053-maximum-subarray",
+        "0055-jump-game",
+        "0045-jump-game-ii",
+        "0134-gas-station",
+        "0846-hand-of-straights",
+        "1899-merge-triplets-to-form-target-triplet",
+        "0763-partition-labels",
+        "0678-valid-parenthesis-string"
+      ],
+      "Intervals": [
+        "0057-insert-interval",
+        "0056-merge-intervals",
+        "0435-non-overlapping-intervals",
+        "0252-meeting-rooms",
+        "0253-meeting-rooms-ii",
+        "1851-minimum-interval-to-include-each-query"
+      ],
+      "Math & Geometry": [
+        "0048-rotate-image",
+        "0054-spiral-matrix",
+        "0073-set-matrix-zeroes",
+        "0202-happy-number",
+        "0066-plus-one",
+        "0050-powx-n",
+        "0043-multiply-strings",
+        "2013-detect-squares"
+      ],
+      "Bit Manipulation": [
+        "0136-single-number",
+        "0191-number-of-1-bits",
+        "0338-counting-bits",
+        "0190-reverse-bits",
+        "0268-missing-number",
+        "0371-sum-of-two-integers",
+        "0007-reverse-integer"
+      ]
+    }
+  },
+  "grind75": {
+    "name": "Grind 75",
+    "description": "75 problems curated by Yangshun for coding interviews",
+    "problems": {
+      "Week 1": [
+        "0001-two-sum",
+        "0020-valid-parentheses",
+        "0021-merge-two-sorted-lists",
+        "0121-best-time-to-buy-and-sell-stock",
+        "0125-valid-palindrome",
+        "0226-invert-binary-tree",
+        "0242-valid-anagram",
+        "0704-binary-search",
+        "0733-flood-fill",
+        "0235-lowest-common-ancestor-of-a-binary-search-tree",
+        "0110-balanced-binary-tree",
+        "0141-linked-list-cycle"
+      ],
+      "Week 2": [
+        "0232-implement-queue-using-stacks",
+        "0278-first-bad-version",
+        "0383-ransom-note",
+        "0070-climbing-stairs",
+        "0409-longest-palindrome",
+        "0206-reverse-linked-list",
+        "0169-majority-element",
+        "0067-add-binary",
+        "0543-diameter-of-binary-tree",
+        "0876-middle-of-the-linked-list",
+        "0104-maximum-depth-of-binary-tree",
+        "0217-contains-duplicate"
+      ],
+      "Week 3": [
+        "0053-maximum-subarray",
+        "0057-insert-interval",
+        "0542-01-matrix",
+        "0973-k-closest-points-to-origin",
+        "0003-longest-substring-without-repeating-characters",
+        "0015-3sum",
+        "0102-binary-tree-level-order-traversal",
+        "0133-clone-graph",
+        "0150-evaluate-reverse-polish-notation"
+      ],
+      "Week 4": [
+        "0207-course-schedule",
+        "0208-implement-trie-prefix-tree",
+        "0322-coin-change",
+        "0238-product-of-array-except-self",
+        "0155-min-stack",
+        "0098-validate-binary-search-tree",
+        "0200-number-of-islands",
+        "0994-rotting-oranges"
+      ],
+      "Week 5": [
+        "0033-search-in-rotated-sorted-array",
+        "0039-combination-sum",
+        "0046-permutations",
+        "0056-merge-intervals",
+        "0300-longest-increasing-subsequence",
+        "0236-lowest-common-ancestor-of-a-binary-tree",
+        "0981-time-based-key-value-store",
+        "0721-accounts-merge"
+      ],
+      "Week 6": [
+        "0075-sort-colors",
+        "0079-word-search",
+        "0416-partition-equal-subset-sum",
+        "0105-construct-binary-tree-from-preorder-and-inorder-traversal",
+        "0017-letter-combinations-of-a-phone-number",
+        "0152-maximum-product-subarray",
+        "0033-search-in-rotated-sorted-array",
+        "0297-serialize-and-deserialize-binary-tree"
+      ],
+      "Week 7": [
+        "0076-minimum-window-substring",
+        "0023-merge-k-sorted-lists",
+        "0295-find-median-from-data-stream",
+        "0127-word-ladder",
+        "0224-basic-calculator",
+        "0084-largest-rectangle-in-histogram",
+        "0042-trapping-rain-water"
+      ]
+    }
+  }
+}
