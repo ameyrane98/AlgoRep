@@ -208,10 +208,10 @@ function renderAISettings() {
     $('#ai_chrome_info').text('Using Chrome Built-in AI (free, on-device)');
   } else {
     // Check for API key
-    api.storage.local.get(['leethub_ai_key', 'leethub_ai_provider'], data => {
-      if (data.leethub_ai_key) {
-        const provider = (data.leethub_ai_provider || 'gemini').charAt(0).toUpperCase()
-          + (data.leethub_ai_provider || 'gemini').slice(1);
+    api.storage.local.get(['algorep_ai_key', 'algorep_ai_provider'], data => {
+      if (data.algorep_ai_key) {
+        const provider = (data.algorep_ai_provider || 'gemini').charAt(0).toUpperCase()
+          + (data.algorep_ai_provider || 'gemini').slice(1);
         $('#ai_status').text(provider).addClass('active');
         $('#ai_chrome_info').text(`Using ${provider} API`);
       } else {
@@ -222,11 +222,11 @@ function renderAISettings() {
   }
 
   // Load saved provider
-  api.storage.local.get(['leethub_ai_provider', 'leethub_ai_key'], data => {
-    if (data.leethub_ai_provider) {
-      $('#ai_provider').val(data.leethub_ai_provider);
+  api.storage.local.get(['algorep_ai_provider', 'algorep_ai_key'], data => {
+    if (data.algorep_ai_provider) {
+      $('#ai_provider').val(data.algorep_ai_provider);
     }
-    if (data.leethub_ai_key) {
+    if (data.algorep_ai_key) {
       $('#ai_key').attr('placeholder', 'Key saved (enter new to replace)');
     }
   });
@@ -237,8 +237,8 @@ function renderAISettings() {
     const provider = $('#ai_provider').val();
     if (key) {
       api.storage.local.set({
-        leethub_ai_key: key,
-        leethub_ai_provider: provider,
+        algorep_ai_key: key,
+        algorep_ai_provider: provider,
       }, () => {
         $('#ai_key').val('');
         $('#ai_key').attr('placeholder', 'Key saved (enter new to replace)');
@@ -251,8 +251,8 @@ function renderAISettings() {
 }
 
 // --- Main Auth & Data Loading ---
-api.storage.local.get('leethub_token', data => {
-  const token = data.leethub_token;
+api.storage.local.get('algorep_token', data => {
+  const token = data.algorep_token;
   if (token === null || token === undefined) {
     action = true;
     $('#auth_mode').show();
@@ -270,14 +270,14 @@ api.storage.local.get('leethub_token', data => {
               $('#commit_mode').show();
               /* Get problem stats and repo link */
               api.storage.local.get(
-                ['stats', 'leethub_hook', 'streakData', 'reviewQueue', 'topicStats'],
+                ['stats', 'algorep_hook', 'streakData', 'reviewQueue', 'topicStats'],
                 data3 => {
                   const stats = data3?.stats;
                   $('#p_solved').text(stats?.solved ?? 0);
                   $('#p_solved_easy').text(stats?.easy ?? 0);
                   $('#p_solved_medium').text(stats?.medium ?? 0);
                   $('#p_solved_hard').text(stats?.hard ?? 0);
-                  const leethubHook = data3?.leethub_hook;
+                  const leethubHook = data3?.algorep_hook;
                   if (leethubHook) {
                     $('#repo_url').html(
                       `<a target="blank" style="color: cadetblue !important; font-size:0.8em;" href="https://github.com/${leethubHook}">${leethubHook}</a>`
@@ -299,7 +299,7 @@ api.storage.local.get('leethub_token', data => {
         } else if (xhr.status === 401) {
           // bad oAuth
           // reset token and redirect to authorization process again!
-          api.storage.local.set({ leethub_token: null }, () => {
+          api.storage.local.set({ algorep_token: null }, () => {
             console.log('BAD oAuth!!! Redirecting back to oAuth process');
             action = true;
             $('#auth_mode').show();

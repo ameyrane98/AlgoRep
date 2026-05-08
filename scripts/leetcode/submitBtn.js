@@ -8,7 +8,7 @@ const getSubmissionPageBtns = () => {
 
 const createToolTip = () => {
   const toolTip = document.createElement('div');
-  toolTip.id = 'leethub-upload-tooltip';
+  toolTip.id = 'algorep-upload-tooltip';
   toolTip.textContent =
     'Manually upload this submission to GitHub (beta).\nThis will OVERWRITE your current submission.\nPlease be mindful of your GitHub rate-limits.';
   toolTip.className =
@@ -18,7 +18,7 @@ const createToolTip = () => {
 
 const createGitIcon = () => {
   const uploadIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  uploadIcon.setAttribute('id', 'leethub-upload-icon');
+  uploadIcon.setAttribute('id', 'algorep-upload-icon');
   uploadIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
   uploadIcon.setAttribute('width', '16');
   uploadIcon.setAttribute('height', '17');
@@ -40,12 +40,12 @@ const createGitIcon = () => {
 
 function addManualSubmitBtn(eventHandler) {
   const btns = getSubmissionPageBtns();
-  if (btns.innerText.includes('Solution') && !btns.innerText.includes('LeetHub')) {
+  if (btns.innerText.includes('Solution') && !btns.innerText.includes('AlgoRep')) {
     btns.appendChild(
       (() => {
         const btn = document.createElement('button');
-        btn.innerText = 'Sync Code LeetHub';
-        btn.setAttribute('style', 'background-color:darkorange');
+        btn.innerText = 'Sync Code AlgoRep';
+        btn.setAttribute('style', 'background-color:#4cc9f0');
         btn.setAttribute(
           'class',
           'group whitespace-nowrap focus:outline-none text-label-r bg-green-s dark:bg-dark-blue-s hover:bg-green-3 dark:hover:bg-dark-blue-3 flex items-center justify-center gap-2 rounded-lg px-3.5 py-1.5 text-sm font-medium'

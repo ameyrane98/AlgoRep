@@ -34,10 +34,10 @@ const DIFFICULTY = Object.freeze({
   UNKNOWN: 'Unknown',
 });
 
-class LeetHubError extends Error {
+class AlgoRepError extends Error {
   constructor(message) {
     super(message);
-    this.name = 'LeetHubErr';
+    this.name = 'AlgoRepErr';
   }
 }
 
@@ -155,7 +155,7 @@ function addLeadingZeros(title) {
 }
 
 function formatStats(time, timePercentile, space, spacePercentile) {
-  return `Time: ${time} (${timePercentile}%), Space: ${space} (${spacePercentile}%) - LeetHub`;
+  return `Time: ${time} (${timePercentile}%), Space: ${space} (${spacePercentile}%) - AlgoRep`;
 }
 
 function isObject(obj) {
@@ -220,6 +220,6 @@ export {
   getDifficulty,
   isEmptyObject,
   languages,
-  LeetHubError,
+  AlgoRepError,
   mergeStats,
 };

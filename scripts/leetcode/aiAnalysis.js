@@ -44,7 +44,7 @@ export async function analyzeSubmission({ code, title, difficulty, language }) {
   const apiResult = await tryExternalAPI(prompt);
   if (apiResult) return apiResult;
 
-  console.log('LeetHub AI: No AI provider available, skipping analysis');
+  console.log('AlgoRep AI: No AI provider available, skipping analysis');
   return null;
 }
 
@@ -80,7 +80,7 @@ async function tryChromeBuildInAI(prompt) {
 
     return parseAIResponse(response);
   } catch (e) {
-    console.log('LeetHub AI: Chrome Built-in AI not available:', e.message);
+    console.log('AlgoRep AI: Chrome Built-in AI not available:', e.message);
     return null;
   }
 }
@@ -90,27 +90,27 @@ async function tryChromeBuildInAI(prompt) {
  */
 async function tryExternalAPI(prompt) {
   try {
-    const { leethub_ai_provider, leethub_ai_key } = await api.storage.local.get([
-      'leethub_ai_provider',
-      'leethub_ai_key',
+    const { algorep_ai_provider, algorep_ai_key } = await api.storage.local.get([
+      'algorep_ai_provider',
+      'algorep_ai_key',
     ]);
 
-    if (!leethub_ai_key) {
+    if (!algorep_ai_key) {
       // Try Gemini free tier without key (limited)
       return null;
     }
 
-    const provider = leethub_ai_provider || 'gemini';
+    const provider = algorep_ai_provider || 'gemini';
 
     if (provider === 'gemini') {
-      return await callGemini(leethub_ai_key, prompt);
+      return await callGemini(algorep_ai_key, prompt);
     } else if (provider === 'openai') {
-      return await callOpenAI(leethub_ai_key, prompt);
+      return await callOpenAI(algorep_ai_key, prompt);
     }
 
     return null;
   } catch (e) {
-    console.log('LeetHub AI: External API error:', e.message);
+    console.log('AlgoRep AI: External API error:', e.message);
     return null;
   }
 }
@@ -193,7 +193,7 @@ function parseAIResponse(text) {
       keyInsight: parsed.keyInsight || '',
     };
   } catch (e) {
-    console.log('LeetHub AI: Failed to parse response:', text?.substring(0, 200));
+    console.log('AlgoRep AI: Failed to parse response:', text?.substring(0, 200));
     return null;
   }
 }

@@ -1,8 +1,8 @@
 {
-  "name": "LeetHub v2",
-  "version": "2.0.8",
+  "name": "algorep",
+  "version": "3.0.0",
   "private": true,
-  "description": "Automatically integrate your code with LeetCode and GitHub",
+  "description": "AI-powered LeetCode learning system - sync solutions to GitHub with spaced repetition, complexity analysis, and study plan tracking",
   "type": "module",
   "scripts": {
     "dev": "webpack --mode=production --watch",

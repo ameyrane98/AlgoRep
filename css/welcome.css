@@ -1,65 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 body {
-  background-color: #000000 !important;
+  background-color: #16213e !important;
   padding: 10px;
   text-align: center;
   transition: background-color 0.75s ease;
-  font-family: 'Helvetica Neue', 'Lucida Grande', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 #title {
-  font-family: 'Norwester', 'Helvetica Neue', 'Lucida Grande',
-    sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 5em;
-  font-weight: bold;
+  font-weight: 700;
   margin-bottom: 0px;
   margin-top: 10px;
+  color: #e8e8e8;
 }
 
 .caption {
-  font-family: 'Norwester', 'Helvetica Neue', 'Lucida Grande',
-    sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 1.5em;
   font-weight: normal !important;
   margin-top: 3px !important;
   margin-bottom: 0px;
+  color: #a0a0b0;
 }
+
 #error {
-  font-family: 'Norwester', 'Helvetica Neue', 'Lucida Grande',
-    sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-weight: normal !important;
-  color: red !important;
+  color: #ef476f !important;
   margin-bottom: 0px;
 }
 
 #success {
-  font-family: 'Norwester', 'Helvetica Neue', 'Lucida Grande',
-    sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 1.1em;
   font-weight: normal !important;
-  color: green !important;
+  color: #06d6a0 !important;
   margin-bottom: 0px;
 }
 
 #unlink {
-  font-family: 'Norwester', 'Helvetica Neue', 'Lucida Grande',
-    sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 1.1em;
   font-weight: normal !important;
-  color: green !important;
+  color: #06d6a0 !important;
   margin-bottom: 0px;
 }
 
 p {
-  color: white !important;
+  color: #e8e8e8 !important;
 }
+
 .onboarding {
-  font-family: sans-serif;
-  border-top: solid white 1px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  border-top: solid #2a2a4a 1px;
   font-weight: 500;
   font-size: medium;
+  color: #e8e8e8;
 }
 
 a {
-  color: white !important;
+  color: #4cc9f0 !important;
   cursor: pointer;
+}
+
+/* Form inputs */
+.ui.form .field select,
+.ui.form .field input {
+  background: #0f3460 !important;
+  color: #e8e8e8 !important;
+  border: 1px solid #2a2a4a !important;
+}
+
+.ui.form .field select option {
+  background: #0f3460;
+  color: #e8e8e8;
+}
+
+/* Button */
+.positive.ui.button {
+  background: #4cc9f0 !important;
+  color: #1a1a2e !important;
+  font-weight: 600;
+}
+
+.positive.ui.button:hover {
+  background: #7209b7 !important;
+  color: #e8e8e8 !important;
+}
+
+/* Inverted headers */
+.ui.inverted.large.header {
+  color: #e8e8e8 !important;
+}
+
+.ui.inverted.small.header {
+  color: #a0a0b0 !important;
 }

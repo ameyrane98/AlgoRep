@@ -1,14 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "LeetHub v2",
-  "description": "Automatically integrate your Leetcode & GeeksforGeeks submissions to GitHub",
-  "homepage_url": "https://github.com/arunbhardwaj/LeetHub-2.0",
+  "name": "AlgoRep",
+  "description": "AI-powered LeetCode learning system - sync solutions to GitHub with spaced repetition, complexity analysis, and study plan tracking",
+  "homepage_url": "https://github.com/ameyrane98/AlgoRep",
   "version": "__LH_VERSION__",
-  "author": "Arun Bhardwaj",
+  "author": "Amey Rane",
   "action": {
     "default_icon": "assets/thumbnail.png",
     "default_popup": "popup.html",
-    "default_title": "Upload your LeetCode solutions to GitHub"
+    "default_title": "AlgoRep - Your LeetCode learning system"
   },
   "icons": {
     "16": "assets/thumbnail.png",
