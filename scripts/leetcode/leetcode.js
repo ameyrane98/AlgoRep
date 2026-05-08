@@ -878,8 +878,9 @@ setupManualSubmitBtn(
     () => {
       const leetCode = new LeetCodeV2();
       // Manual submission event can only fire when we have submissionId. Simply retrieve it.
-      const submissionId = window.location.href.match(/leetcode\.com\/.*\/submissions\/(\d+)/)[1];
-      leetCode.submissionId = submissionId;
+      const submissionMatch = window.location.href.match(/leetcode\.com\/.*\/submissions\/(\d+)/);
+      if (!submissionMatch) return;
+      leetCode.submissionId = submissionMatch[1];
       loader(leetCode);
       return;
     },
