@@ -73,7 +73,7 @@ Traditional tools stop at syncing code. **AlgoRep** transforms your LeetCode pra
 
 ## 🙏 Credits
 
-AlgoRep is an evolution of the revolutionary [LeetHub](https://github.com/arunbhardwaj/LeetHub-2.0). It focuses on adding retention-based learning and AI insights to the core syncing functionality.
+AlgoRep was inspired by [LeetHub](https://github.com/arunbhardwaj/LeetHub-2.0). It focuses on adding retention-based learning and AI insights to the core syncing functionality.
 
 ---
 
