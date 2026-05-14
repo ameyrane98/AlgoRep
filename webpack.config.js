@@ -27,6 +27,8 @@ const ignore = [
   '**/scripts/leetcode/**',
   '**/scripts/welcome.js',
   '**/scripts/popup.js',
+  '**/scripts/background.js',
+  '**/scripts/githubApp.js',
   '**/manifest-chrome.json',
   '**/manifest-firefox.json',
   // ...entries.map((entry) => `**/${entry}.js`),
@@ -55,6 +57,7 @@ export default {
     leetcode: path.resolve(__dirname, 'scripts', 'leetcode', 'leetcode.js'),
     welcome: './scripts/welcome.js',
     popup: './scripts/popup.js',
+    background: './scripts/background.js',
   },
   watchOptions: {
     ignored: '**/dist/**',
@@ -145,6 +148,10 @@ export default {
             {
               source: './dist/popup.js',
               destination: './dist/scripts/popup.js',
+            },
+            {
+              source: './dist/background.js',
+              destination: './dist/scripts/background.js',
             },
           ],
           copy: [ // Copy everything to chrome and firefox

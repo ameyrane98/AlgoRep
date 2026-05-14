@@ -14,8 +14,8 @@ import {
   todayISO,
 } from "./leetcode/weeklyPatterns.js";
 import { backfillFromRepo } from "./leetcode/repoBackfill.js";
+import { getValidToken, githubFetch } from "./githubApp.js";
 
-let action = false;
 const api = getBrowser();
 
 // ============================================================
@@ -40,7 +40,11 @@ $('#theme_toggle').on('click', () => {
   });
 });
 
-$('#authenticate').on('click', () => { if (action) oAuth2.begin(); });
+// The popup is too small (and too short-lived) to host the Device Flow UI;
+// onboarding lives entirely in welcome.html.
+$('#authenticate').on('click', () => {
+  api.tabs.create({ url: api.runtime.getURL('welcome.html') });
+});
 $('#welcome_URL').attr('href', api.runtime.getURL('welcome.html'));
 $('#hook_URL').attr('href', api.runtime.getURL('welcome.html'));
 
@@ -575,80 +579,62 @@ function renderAISettings() {
 // ============================================================
 // Bootstrap
 // ============================================================
-api.storage.local.get('algorep_token', data => {
-  const token = data.algorep_token;
-  if (token === null || token === undefined) {
-    action = true;
-    $('#auth_mode').show();
-    return;
-  }
-  const xhr = new XMLHttpRequest();
-  xhr.addEventListener('readystatechange', function () {
-    if (xhr.readyState !== 4) return;
-    if (xhr.status === 200) {
-      api.storage.local.get('mode_type', data2 => {
-        if (data2 && data2.mode_type === 'commit') {
-          $('#commit_mode').show();
-          api.storage.local.get(
-            ['stats', 'algorep_hook', 'streakData', 'reviewQueue', 'topicStats', 'submissionHistory'],
-            async data3 => {
-              const stats = data3?.stats;
-              let submissionHistory = data3?.submissionHistory;
+(async () => {
+  const token = await getValidToken();
+  if (!token) { $('#auth_mode').show(); return; }
 
-              $('#p_solved').text(stats?.solved ?? 0);
-              $('#p_solved_easy').text(stats?.easy ?? 0);
-              $('#p_solved_medium').text(stats?.medium ?? 0);
-              $('#p_solved_hard').text(stats?.hard ?? 0);
+  // Verify the token works (catches revoked installs) before painting the dash.
+  let ok = false;
+  try {
+    const res = await githubFetch('/user');
+    ok = res.ok;
+  } catch (_) { ok = false; }
+  if (!ok) { $('#auth_mode').show(); return; }
 
-              renderRepoLink(data3?.algorep_hook);
-              renderStreak(data3?.streakData);
+  const { mode_type } = await api.storage.local.get('mode_type');
+  if (mode_type !== 'commit') { $('#hook_mode').show(); return; }
 
-              initTabs();
-              initPeriodToggle(submissionHistory);
+  $('#commit_mode').show();
+  const data3 = await api.storage.local.get([
+    'stats', 'algorep_hook', 'streakData', 'reviewQueue', 'topicStats', 'submissionHistory',
+  ]);
+  const stats = data3?.stats;
+  let submissionHistory = data3?.submissionHistory;
 
-              renderTodayCard(submissionHistory, data3?.reviewQueue);
-              await renderRotationNudge(submissionHistory);
-              await renderActivePattern(submissionHistory);
-              await renderWeeklyPatterns(submissionHistory);
-              renderActivity(submissionHistory);
-              renderTopicStats(data3?.topicStats);
-              renderStudyPlan(stats);
-              renderAISettings();
+  $('#p_solved').text(stats?.solved ?? 0);
+  $('#p_solved_easy').text(stats?.easy ?? 0);
+  $('#p_solved_medium').text(stats?.medium ?? 0);
+  $('#p_solved_hard').text(stats?.hard ?? 0);
 
-              // Background: backfill any solves that exist in the repo but
-              // missed local saveSubmissionRecord (e.g. from a build glitch
-              // or a fresh extension install). Re-render the data-driven
-              // sections if anything was added.
-              try {
-                const result = await backfillFromRepo();
-                if (result?.addedSlugs?.length > 0) {
-                  const { submissionHistory: merged } =
-                    await api.storage.local.get('submissionHistory');
-                  submissionHistory = merged;
-                  initPeriodToggle(submissionHistory);
-                  renderTodayCard(submissionHistory, data3?.reviewQueue);
-                  await renderActivePattern(submissionHistory);
-                  await renderWeeklyPatterns(submissionHistory);
-                  renderActivity(submissionHistory);
-                  console.log(`AlgoRep: backfilled ${result.addedSlugs.length} solves from repo`);
-                }
-              } catch (e) {
-                console.log('Repo backfill skipped:', e?.message || e);
-              }
-            }
-          );
-        } else {
-          $('#hook_mode').show();
-        }
-      });
-    } else if (xhr.status === 401) {
-      api.storage.local.set({ algorep_token: null }, () => {
-        action = true;
-        $('#auth_mode').show();
-      });
+  renderRepoLink(data3?.algorep_hook);
+  renderStreak(data3?.streakData);
+
+  initTabs();
+  initPeriodToggle(submissionHistory);
+
+  renderTodayCard(submissionHistory, data3?.reviewQueue);
+  await renderRotationNudge(submissionHistory);
+  await renderActivePattern(submissionHistory);
+  await renderWeeklyPatterns(submissionHistory);
+  renderActivity(submissionHistory);
+  renderTopicStats(data3?.topicStats);
+  renderStudyPlan(stats);
+  renderAISettings();
+
+  try {
+    const result = await backfillFromRepo();
+    if (result?.addedSlugs?.length > 0) {
+      const { submissionHistory: merged } =
+        await api.storage.local.get('submissionHistory');
+      submissionHistory = merged;
+      initPeriodToggle(submissionHistory);
+      renderTodayCard(submissionHistory, data3?.reviewQueue);
+      await renderActivePattern(submissionHistory);
+      await renderWeeklyPatterns(submissionHistory);
+      renderActivity(submissionHistory);
+      console.log(`AlgoRep: backfilled ${result.addedSlugs.length} solves from repo`);
     }
-  });
-  xhr.open('GET', 'https://api.github.com/user', true);
-  xhr.setRequestHeader('Authorization', `token ${token}`);
-  xhr.send();
-});
+  } catch (e) {
+    console.log('Repo backfill skipped:', e?.message || e);
+  }
+})();

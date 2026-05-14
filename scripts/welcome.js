@@ -15,14 +15,12 @@ import {
   localDateOf,
 } from './leetcode/weeklyPatterns.js';
 import { backfillFromRepo } from './leetcode/repoBackfill.js';
+import { APP, installUrl, getValidToken, githubFetch } from './githubApp.js';
 
 const api = getBrowser();
 
-const createRepoDescription =
-  'A collection of LeetCode questions to ace the coding interview! - Created using [AlgoRep](https://github.com/ameyrane98/AlgoRep)';
-
 // ============================================================
-// Setup / hook flow (kept compatible with prior behaviour)
+// Setup flow — Device Flow auth → install GitHub App → pick repo
 // ============================================================
 function showError(html) {
   $('#success_banner').hide();
@@ -35,90 +33,56 @@ function showSuccess(html) {
 }
 
 const syncStats = async () => {
-  let { algorep_hook, algorep_token, sync_stats } = await api.storage.local.get([
-    'algorep_token',
-    'algorep_hook',
-    'sync_stats',
-  ]);
+  const { algorep_hook, sync_stats } = await api.storage.local.get(['algorep_hook', 'sync_stats']);
+  if (sync_stats === false || !algorep_hook) return;
 
-  if (sync_stats === false) return;
-
-  const URL = `https://api.github.com/repos/${algorep_hook}/contents/stats.json`;
-  let resp = await fetch(URL, {
-    method: 'GET',
-    headers: { Authorization: `token ${algorep_token}`, Accept: 'application/vnd.github.v3+json' },
-  });
-  if (!resp.ok && resp.status === 404) {
-    await api.storage.local.set({ sync_stats: false });
+  const resp = await githubFetch(`/repos/${algorep_hook}/contents/stats.json`);
+  if (!resp.ok) {
+    if (resp.status === 404) await api.storage.local.set({ sync_stats: false });
     return {};
   }
-  let data = await resp.json();
-  let pStats = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+  const data = await resp.json();
+  const pStats = JSON.parse(decodeURIComponent(escape(atob(data.content))));
   api.storage.local.set({ stats: pStats.leetcode, sync_stats: false });
   return { stats: pStats.leetcode };
 };
 
-const createRepo = async (token, name) => {
-  const res = await fetch('https://api.github.com/user/repos', {
-    method: 'POST',
-    headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
-    body: JSON.stringify({ name, private: true, auto_init: true, description: createRepoDescription }),
-  });
-  if (!res.ok) {
-    const errors = {
-      304: `Error creating ${name} — try again later.`,
-      400: `Bad request creating ${name}.`,
-      401: `Unauthorized — re-launch the extension.`,
-      403: `Forbidden — try again later.`,
-      422: `${name} may already exist. Try the "Link" option instead.`,
-    };
-    showError(errors[res.status] || `Error creating ${name}: ${res.status}`);
-    return;
+// Verify the saved hook still exists for the current installation. Used on boot
+// to catch the case where the user uninstalled AlgoRep from that repo.
+async function verifyHook(hook) {
+  const res = await githubFetch(`/repos/${hook}`);
+  return res.ok;
+}
+
+async function listInstalledRepos() {
+  const insts = await githubFetch('/user/installations');
+  if (!insts.ok) throw new Error(`installations_${insts.status}`);
+  const { installations } = await insts.json();
+  const ours = installations.filter(i => i.app_id != null);
+  // Surface the first AlgoRep installation we find. The app is single-tenant
+  // (one install per user account) so this is sufficient.
+  if (ours.length === 0) return { installationId: null, repos: [] };
+
+  const installationId = ours[0].id;
+  await api.storage.local.set({ algorep_installation_id: installationId });
+
+  const repos = [];
+  let page = 1;
+  while (true) {
+    const res = await githubFetch(`/user/installations/${installationId}/repositories?per_page=100&page=${page}`);
+    if (!res.ok) throw new Error(`repositories_${res.status}`);
+    const data = await res.json();
+    repos.push(...data.repositories);
+    if (data.repositories.length < 100) break;
+    page += 1;
   }
-  const repo = await res.json();
-  api.storage.local.set({ mode_type: 'commit', algorep_hook: repo.full_name });
-  await api.storage.local.remove('stats');
-  showSuccess(`Created <a target="_blank" href="${repo.html_url}">${repo.full_name}</a> — start LeetCoding!`);
-  enterCommitMode();
-};
+  return { installationId, repos };
+}
 
-const linkRepo = (token, name) => {
-  const xhr = new XMLHttpRequest();
-  xhr.addEventListener('readystatechange', function () {
-    if (xhr.readyState !== 4) return;
-    if (xhr.status !== 200) {
-      const errors = {
-        301: `${name} has been moved permanently.`,
-        403: `Forbidden — check your access to ${name}.`,
-        404: `${name} not found. Check the repository name.`,
-      };
-      showError(errors[xhr.status] || `Error linking ${name}: ${xhr.status}`);
-      api.storage.local.set({ mode_type: 'hook', algorep_hook: null });
-      enterHookMode();
-      return;
-    }
-    const res = JSON.parse(xhr.responseText);
-    api.storage.local.set(
-      { mode_type: 'commit', repo: res.html_url, algorep_hook: res.full_name },
-      () => {
-        showSuccess(`Linked <a target="_blank" href="${res.html_url}">${res.full_name}</a>.`);
-        api.storage.local
-          .get('sync_stats')
-          .then(d => (d?.sync_stats ? syncStats() : null))
-          .then(() => enterCommitMode());
-      }
-    );
-  });
-  xhr.open('GET', `https://api.github.com/repos/${name}`, true);
-  xhr.setRequestHeader('Authorization', `token ${token}`);
-  xhr.setRequestHeader('Accept', 'application/vnd.github.v3+json');
-  xhr.send();
-};
-
-const unlinkRepo = () => {
-  api.storage.local.set({ mode_type: 'hook', algorep_hook: null, sync_stats: true, stats: null });
-  enterHookMode();
-  showSuccess('Unlinked your repo. Connect a new one to keep going.');
+const unlinkRepo = async () => {
+  await api.storage.local.set({ algorep_hook: null, mode_type: 'hook', sync_stats: true, stats: null });
+  showSuccess('Unlinked. Pick another repo or install AlgoRep on more.');
+  await routeToCurrentStep();
 };
 
 // ============================================================
@@ -143,33 +107,128 @@ $('#theme_toggle').on('click', () => {
   });
 });
 
-$('#type').on('change', function () {
-  $('#hook_button').prop('disabled', !this.value);
+// ---------- Step 1: Device Flow ----------
+let deviceFlowPort = null;
+
+function showAuthStep() {
+  $('#auth_step').show();
+  $('#install_step, #pick_repo_step').hide();
+  $('#device_code_panel').hide();
+  $('#connect_github_btn').show().prop('disabled', false);
+  $('#device_flow_status').hide();
+}
+
+function showInstallStep() {
+  $('#auth_step, #pick_repo_step').hide();
+  $('#install_step').show();
+  $('#install_app_link').attr('href', installUrl());
+}
+
+function showPickStep() {
+  $('#auth_step, #install_step').hide();
+  $('#pick_repo_step').show();
+  $('#install_app_link_more').attr('href', installUrl());
+}
+
+$('#connect_github_btn').on('click', async () => {
+  $('#error_banner').hide();
+  $('#success_banner').hide();
+  $('#connect_github_btn').prop('disabled', true);
+  $('#device_flow_status').text('Starting device flow...').show();
+
+  // Hold a port open so the service worker stays alive while we poll GitHub.
+  try { deviceFlowPort?.disconnect(); } catch (_) {}
+  deviceFlowPort = api.runtime.connect({ name: 'device_flow' });
+
+  try {
+    const resp = await api.runtime.sendMessage({ type: 'START_DEVICE_FLOW' });
+    if (!resp || resp.error || !resp.user_code) {
+      throw new Error(resp?.error || 'no_response');
+    }
+    $('#user_code').text(resp.user_code);
+    $('#device_open_link').attr('href', resp.verification_uri_complete || resp.verification_uri);
+    $('#device_flow_status').hide();
+    $('#device_code_panel').show();
+    // Auto-open GitHub so the user just has to click Authorize.
+    try { window.open(resp.verification_uri_complete || resp.verification_uri, '_blank'); } catch (_) {}
+  } catch (e) {
+    $('#device_flow_status').hide();
+    $('#connect_github_btn').prop('disabled', false);
+    showError(`Could not start device flow: ${e.message}`);
+  }
 });
 
-$('#hook_button').on('click', () => {
-  const opt = $('#type').val();
-  const name = $('#name').val().trim();
-  if (!opt) return showError('Pick an option from the dropdown.');
-  if (!name) {
-    $('#name').focus();
-    return showError('Enter a repository name.');
-  }
-  $('#error_banner').hide();
-  showSuccess('Working on it...');
+$('#cancel_device_flow').on('click', async () => {
+  await api.runtime.sendMessage({ type: 'CANCEL_DEVICE_FLOW' });
+  try { deviceFlowPort?.disconnect(); } catch (_) {}
+  deviceFlowPort = null;
+  showAuthStep();
+});
 
-  api.storage.local.get('algorep_token', data => {
-    const token = data.algorep_token;
-    if (!token) return showError('Authorize AlgoRep with GitHub first (open the extension popup).');
-    if (opt === 'new') {
-      createRepo(token, name);
-    } else {
-      api.storage.local.get('algorep_username', data2 => {
-        if (!data2.algorep_username) return showError('Improper authorization — re-launch the extension.');
-        linkRepo(token, `${data2.algorep_username}/${name}`);
-      });
+// React to the background's auth result via storage changes (works even if
+// the SW restarted between the start of the poll and now).
+api.storage.onChanged.addListener(async (changes, area) => {
+  if (area !== 'local' || !changes.auth_event) return;
+  const evt = changes.auth_event.newValue;
+  if (!evt) return;
+  if (evt.type === 'success') {
+    try { deviceFlowPort?.disconnect(); } catch (_) {}
+    deviceFlowPort = null;
+    showSuccess('Connected to GitHub.');
+    await routeToCurrentStep();
+  } else if (evt.type === 'error') {
+    try { deviceFlowPort?.disconnect(); } catch (_) {}
+    deviceFlowPort = null;
+    const friendly = {
+      access_denied: 'You denied the request on GitHub.',
+      expired_token: 'The code expired before you authorized. Try again.',
+      unsupported_grant_type: 'GitHub App isn’t configured for Device Flow.',
+    };
+    showError(friendly[evt.error] || `Auth failed: ${evt.error}`);
+    showAuthStep();
+  }
+});
+
+// ---------- Step 2: install ----------
+$('#refresh_installs_btn').on('click', () => routeToCurrentStep());
+
+// ---------- Step 3: pick repo ----------
+async function populateRepoSelect() {
+  const sel = $('#installed_repo_select');
+  sel.empty().append('<option value="">Loading...</option>');
+  $('#use_repo_btn').prop('disabled', true);
+  try {
+    const { repos } = await listInstalledRepos();
+    sel.empty();
+    if (repos.length === 0) {
+      sel.append('<option value="">No repos selected during install</option>');
+      return;
     }
-  });
+    sel.append('<option value="">Pick a repository</option>');
+    for (const r of repos) {
+      sel.append(`<option value="${r.full_name}">${r.full_name}${r.private ? ' (private)' : ''}</option>`);
+    }
+  } catch (e) {
+    sel.empty().append('<option value="">Error loading repos</option>');
+    showError(`Couldn’t list repos: ${e.message}`);
+  }
+}
+
+$('#installed_repo_select').on('change', function () {
+  $('#use_repo_btn').prop('disabled', !this.value);
+});
+
+$('#use_repo_btn').on('click', async () => {
+  const hook = $('#installed_repo_select').val();
+  if (!hook) return;
+  $('#error_banner').hide();
+  showSuccess('Linking...');
+  await api.storage.local.set({ algorep_hook: hook, mode_type: 'commit' });
+  await api.storage.local.remove('stats');
+  showSuccess(`Linked <a target="_blank" href="https://github.com/${hook}">${hook}</a>.`);
+  const sync = await api.storage.local.get('sync_stats');
+  if (sync?.sync_stats) { try { await syncStats(); } catch (_) {} }
+  enterCommitMode();
 });
 
 $('#unlink_btn').on('click', unlinkRepo);
@@ -671,24 +730,36 @@ async function loadDashboard() {
 }
 
 // ============================================================
-// Boot: detect mode and route
+// Boot: figure out which step the user is on and show it
 // ============================================================
-api.storage.local.get('mode_type', data => {
-  const mode = data.mode_type;
-  if (mode !== 'commit') { enterHookMode(); return; }
+async function routeToCurrentStep() {
+  enterHookMode();
+  const token = await getValidToken();
+  if (!token) { showAuthStep(); return; }
 
-  api.storage.local.get(['algorep_token', 'algorep_hook'], d2 => {
-    if (!d2.algorep_token) {
-      showError('Authorization missing. Open the extension popup to authenticate with GitHub.');
-      enterHookMode();
+  // Token in hand. Do they have an AlgoRep installation with at least one repo?
+  let repos = [];
+  try {
+    const result = await listInstalledRepos();
+    repos = result.repos;
+  } catch (e) {
+    showError(`Couldn’t reach GitHub: ${e.message}`);
+    showAuthStep();
+    return;
+  }
+  if (repos.length === 0) { showInstallStep(); return; }
+
+  // Installed. Do we already have a hook saved?
+  const { algorep_hook } = await api.storage.local.get('algorep_hook');
+  if (algorep_hook && repos.some(r => r.full_name === algorep_hook)) {
+    if (await verifyHook(algorep_hook)) {
+      enterCommitMode();
       return;
     }
-    if (!d2.algorep_hook) {
-      showError('No repo linked. Pick an option below to connect one.');
-      enterHookMode();
-      return;
-    }
-    // Soft-verify the link still works, then load
-    linkRepo(d2.algorep_token, d2.algorep_hook);
-  });
-});
+  }
+  // Need to pick (or re-pick if the saved hook is no longer installed)
+  showPickStep();
+  await populateRepoSelect();
+}
+
+routeToCurrentStep();

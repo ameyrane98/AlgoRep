@@ -36,24 +36,51 @@
       <!-- HOOK MODE: setup -->
       <section id="hook_mode" class="setup" hidden>
         <div class="setup-card">
-          <h2>Get started</h2>
-          <p class="setup-sub">Connect a GitHub repository to feed your AlgoRep dashboard.</p>
 
-          <div class="setup-form">
-            <label>
-              <span class="setup-label">Repository</span>
-              <select id="type">
-                <option value="">Pick an option</option>
-                <option value="new">Create a new private repository</option>
-                <option value="link">Link an existing repository</option>
-              </select>
-            </label>
-            <label>
-              <span class="setup-label">Name</span>
-              <input id="name" type="text" autocomplete="off" placeholder="e.g. LeetCodeGrind" />
-            </label>
-            <button id="hook_button" class="primary-btn" disabled>Get started</button>
+          <!-- Step 1: connect GitHub via Device Flow -->
+          <div id="auth_step" hidden>
+            <h2>Connect to GitHub</h2>
+            <p class="setup-sub">AlgoRep uses GitHub's Device Flow — no passwords, no secrets in the extension.</p>
+            <button id="connect_github_btn" class="primary-btn">Connect to GitHub</button>
+            <p id="device_flow_status" class="setup-sub" hidden></p>
+            <div id="device_code_panel" hidden>
+              <p class="setup-sub">
+                Enter this code on GitHub:
+              </p>
+              <div id="user_code" class="user-code-display"></div>
+              <a id="device_open_link" target="_blank" class="primary-btn">Open GitHub to authorize</a>
+              <p class="setup-sub">Waiting for you to approve on GitHub...</p>
+              <button id="cancel_device_flow" class="ghost-btn">Cancel</button>
+            </div>
           </div>
+
+          <!-- Step 2: install the GitHub App on the repo(s) you want to sync -->
+          <div id="install_step" hidden>
+            <h2>Install AlgoRep on your repo</h2>
+            <p class="setup-sub">
+              Pick which repository AlgoRep can write to. The extension only sees the repos you select — nothing else.
+            </p>
+            <a id="install_app_link" target="_blank" class="primary-btn">Install AlgoRep on GitHub</a>
+            <p class="setup-sub">After installing, return here and click Refresh.</p>
+            <button id="refresh_installs_btn" class="ghost-btn">Refresh</button>
+          </div>
+
+          <!-- Step 3: pick which installed repo to use as the sync target -->
+          <div id="pick_repo_step" hidden>
+            <h2>Pick your sync repo</h2>
+            <p class="setup-sub">Choose the repository AlgoRep should commit your solutions to.</p>
+            <div class="setup-form">
+              <label>
+                <span class="setup-label">Repository</span>
+                <select id="installed_repo_select">
+                  <option value="">Loading...</option>
+                </select>
+              </label>
+              <button id="use_repo_btn" class="primary-btn" disabled>Use this repo</button>
+              <a id="install_app_link_more" target="_blank" class="ghost-btn">Add another repo to AlgoRep</a>
+            </div>
+          </div>
+
         </div>
       </section>
 

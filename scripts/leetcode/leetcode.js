@@ -20,6 +20,7 @@ import {
 } from './submissionHistory.js';
 import { scheduleProblemForReview } from './spacedRepetition.js';
 import { analyzeSubmission, formatAnalysisMarkdown, saveAnalysis } from './aiAnalysis.js';
+import { getValidToken } from '../githubApp.js';
 
 /* Commit messages */
 const readmeMsg = 'Create README - AlgoRep';
@@ -96,7 +97,7 @@ const upload = async (token, hook, content, problem, filename, sha, message) => 
   let options = {
     method: 'PUT',
     headers: {
-      Authorization: `token ${token}`,
+      Authorization: `Bearer ${token}`,
       Accept: 'application/vnd.github.v3+json',
     },
     body: JSON.stringify(data),
@@ -169,10 +170,8 @@ const setPersistentStats = async localStats => {
   const pStatsEncoded = encode(JSON.stringify(pStats));
   const sha = localStats?.shas?.[readmeFilename]?.[''] || '';
 
-  const { algorep_token: token, algorep_hook: hook } = await api.storage.local.get([
-    'algorep_token',
-    'algorep_hook',
-  ]);
+  const token = await getValidToken();
+  const { algorep_hook: hook } = await api.storage.local.get('algorep_hook');
 
   try {
     return await upload(token, hook, pStatsEncoded, statsFilename, '', sha, updateStatsMsg);
@@ -208,10 +207,8 @@ const updateReadmeWithDiscussionPost = async (
   shouldPreprendDiscussionPosts
 ) => {
   let responseSHA;
-  const { algorep_token, algorep_hook } = await api.storage.local.get([
-    'algorep_token',
-    'algorep_hook',
-  ]);
+  const algorep_token = await getValidToken();
+  const { algorep_hook } = await api.storage.local.get('algorep_hook');
 
   return getGitHubFile(algorep_token, algorep_hook, directory, filename)
     .then(resp => resp.json())
@@ -252,26 +249,22 @@ async function uploadGitWith409Retry(
   commitMsg,
   optionals
 ) {
-  let token;
-  let hook;
-
   const storageData = await api.storage.local.get([
-    'algorep_token',
     'mode_type',
     'algorep_hook',
     'stats',
   ]);
 
-  token = storageData.algorep_token;
+  const token = await getValidToken();
   if (!token) {
-    throw new AlgoRepError('LeethubTokenUndefined');
+    throw new AlgoRepError('AlgoRepTokenUndefined');
   }
 
   if (storageData.mode_type !== 'commit') {
-    throw new AlgoRepError('LeetHubNotAuthorizedByGit');
+    throw new AlgoRepError('AlgoRepNotAuthorizedByGit');
   }
 
-  hook = storageData.algorep_hook;
+  const hook = storageData.algorep_hook;
   if (!hook) {
     throw new AlgoRepError('NoRepoDefined');
   }
@@ -334,7 +327,7 @@ async function getGitHubFile(token, hook, directory, filename) {
   let options = {
     method: 'GET',
     headers: {
-      Authorization: `token ${token}`,
+      Authorization: `Bearer ${token}`,
       Accept: 'application/vnd.github.v3+json',
     },
   };
@@ -389,11 +382,8 @@ async function updateReadmeTopicTagsWithProblem(topicTags, problemName) {
     return;
   }
 
-  const { algorep_token, algorep_hook, stats } = await api.storage.local.get([
-    'algorep_token',
-    'algorep_hook',
-    'stats',
-  ]);
+  const algorep_token = await getValidToken();
+  const { algorep_hook, stats } = await api.storage.local.get(['algorep_hook', 'stats']);
 
   let readme;
   let newSha;
@@ -532,10 +522,8 @@ function loader(leetCode) {
       let archiveOldVersion;
       const existingSha = priorStats?.shas?.[fullPath]?.[filename];
       if (existingSha) {
-        const { algorep_token, algorep_hook } = await api.storage.local.get([
-          'algorep_token',
-          'algorep_hook',
-        ]);
+        const algorep_token = await getValidToken();
+        const { algorep_hook } = await api.storage.local.get('algorep_hook');
         try {
           const oldFileData = await getGitHubFile(
             algorep_token,
@@ -779,10 +767,9 @@ async function v2SubmissionHandler(event, leetCode) {
   // Track submission attempts
   submitAttemptCount++;
 
-  const authenticated =
-    !isEmptyObject(await api.storage.local.get(['algorep_token'])) &&
-    !isEmptyObject(await api.storage.local.get(['algorep_hook']));
-  if (!authenticated) {
+  const token = await getValidToken();
+  const { algorep_hook } = await api.storage.local.get('algorep_hook');
+  if (!token || !algorep_hook) {
     throw new AlgoRepError('UserNotAuthenticated');
   }
 
@@ -838,12 +825,12 @@ submitBtnObserver.observe(document.body, {
   subtree: true,
 });
 
-/* Sync to local storage */
+/* One-time migration of legacy non-secret prefs from chrome.storage.sync.
+   Device Flow tokens are deliberately NOT synced — each device authenticates
+   itself, and the refresh token is single-use so it can't be shared. */
 api.storage.local.get('isSync', data => {
   const keys = [
-    'algorep_token',
     'algorep_username',
-    'pipe_algorep',
     'stats',
     'algorep_hook',
     'mode_type',

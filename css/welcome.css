@@ -1169,3 +1169,19 @@ a:hover { text-decoration: underline; }
 ::-webkit-scrollbar-track { background: #0f1830; }
 ::-webkit-scrollbar-thumb { background: #2a2a4a; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #4cc9f0; }
+
+/* Device Flow user code */
+.user-code-display {
+  font-family: 'SF Mono', Menlo, Monaco, Consolas, monospace;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-align: center;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+  background: rgba(76, 201, 240, 0.12);
+  border: 1px solid rgba(76, 201, 240, 0.35);
+  border-radius: 8px;
+  color: #4cc9f0;
+  user-select: all;
+}

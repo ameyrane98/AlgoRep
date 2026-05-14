@@ -1,4 +1,5 @@
 import { getBrowser } from './util.js';
+import { getValidToken } from '../githubApp.js';
 
 const api = getBrowser();
 
@@ -17,8 +18,9 @@ const CACHE_KEY = 'repoBackfillCache';
  * Returns `{ addedSlugs: string[] }` or `null` if the call was skipped.
  */
 export async function backfillFromRepo({ force = false } = {}) {
-  const { algorep_token: token, algorep_hook: hook, [CACHE_KEY]: cache } =
-    await api.storage.local.get(['algorep_token', 'algorep_hook', CACHE_KEY]);
+  const token = await getValidToken();
+  const { algorep_hook: hook, [CACHE_KEY]: cache } =
+    await api.storage.local.get(['algorep_hook', CACHE_KEY]);
 
   if (!token || !hook) return null;
 
@@ -106,7 +108,7 @@ async function fetchCommits(token, hook, sinceISO) {
   try {
     const url = `https://api.github.com/repos/${hook}/commits?since=${encodeURIComponent(sinceISO)}&per_page=100`;
     const res = await fetch(url, {
-      headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
+      headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' },
     });
     if (!res.ok) {
       console.log('Repo backfill: commits list failed', res.status);
@@ -122,7 +124,7 @@ async function fetchCommits(token, hook, sinceISO) {
 async function fetchCommitFiles(token, commitUrl) {
   try {
     const res = await fetch(commitUrl, {
-      headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' },
+      headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' },
     });
     if (!res.ok) return [];
     const detail = await res.json();
