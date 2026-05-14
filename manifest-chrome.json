@@ -27,6 +27,10 @@
     "storage",
     "webNavigation"
   ],
+  "host_permissions": [
+    "https://github.com/*",
+    "https://api.github.com/*"
+  ],
   "content_scripts": [
     {
       "matches": ["https://leetcode.com/*"],

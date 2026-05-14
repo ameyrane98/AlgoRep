@@ -1,6 +1,6 @@
 {
   "name": "algorep",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "private": true,
   "description": "AI-powered LeetCode learning system - sync solutions to GitHub with spaced repetition, complexity analysis, and study plan tracking",
   "type": "module",

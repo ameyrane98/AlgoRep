@@ -3,7 +3,7 @@
 
 export const APP = {
   CLIENT_ID: 'Iv23lir31sGJS3ZEv9Sz',
-  APP_SLUG: 'algorep',
+  APP_SLUG: 'algorep-sync',
   DEVICE_CODE_URL: 'https://github.com/login/device/code',
   ACCESS_TOKEN_URL: 'https://github.com/login/oauth/access_token',
   API_BASE: 'https://api.github.com',

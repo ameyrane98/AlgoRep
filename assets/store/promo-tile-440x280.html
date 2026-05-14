@@ -1,0 +1,156 @@
+<!doctype html>
+<!--
+  AlgoRep Chrome Web Store small promo tile, 440x280.
+  Open in Chrome, take a screenshot of just the .tile element
+  (Cmd+Shift+5 → "Capture Selected Portion", drag over the box, or
+   right-click .tile in DevTools → Capture node screenshot).
+  Output should be exactly 440x280 PNG.
+-->
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      body {
+        margin: 0;
+        background: #0d1224;
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        font-family: 'Inter', -apple-system, sans-serif;
+      }
+      .tile {
+        width: 440px;
+        height: 280px;
+        background:
+          radial-gradient(circle at 90% 10%, rgba(76, 201, 240, 0.18), transparent 50%),
+          radial-gradient(circle at 10% 100%, rgba(114, 9, 183, 0.18), transparent 55%),
+          linear-gradient(135deg, #11183a 0%, #0a0f24 100%);
+        color: #f5f7fb;
+        padding: 28px 30px;
+        box-sizing: border-box;
+        position: relative;
+        overflow: hidden;
+        border-radius: 0; /* store tiles aren't rounded */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #4cc9f0 0%, #7209b7 100%);
+        display: grid;
+        place-items: center;
+        box-shadow: 0 4px 16px rgba(76, 201, 240, 0.3);
+      }
+      .logo-mark {
+        width: 22px;
+        height: 22px;
+      }
+      .name {
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        line-height: 1;
+      }
+      .name .accent { color: #4cc9f0; }
+      .tagline {
+        font-size: 11px;
+        color: #a0a6c0;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        margin-top: 2px;
+      }
+      .headline {
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1.2;
+        margin: 0;
+        max-width: 380px;
+      }
+      .headline .em {
+        background: linear-gradient(90deg, #4cc9f0, #ef476f);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .features {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 8px;
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+      }
+      .chip {
+        background: rgba(76, 201, 240, 0.12);
+        border: 1px solid rgba(76, 201, 240, 0.3);
+        color: #4cc9f0;
+        padding: 4px 9px;
+        border-radius: 999px;
+      }
+      .chip-2 {
+        background: rgba(239, 71, 111, 0.12);
+        border-color: rgba(239, 71, 111, 0.32);
+        color: #ef476f;
+      }
+      .chip-3 {
+        background: rgba(6, 214, 160, 0.12);
+        border-color: rgba(6, 214, 160, 0.32);
+        color: #06d6a0;
+      }
+      .chip-4 {
+        background: rgba(255, 209, 102, 0.12);
+        border-color: rgba(255, 209, 102, 0.32);
+        color: #ffd166;
+      }
+      .footer-mark {
+        position: absolute;
+        bottom: 14px;
+        right: 18px;
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.32);
+        font-weight: 600;
+        letter-spacing: 0.4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="tile">
+      <div class="brand">
+        <div class="logo">
+          <svg class="logo-mark" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3 L21 21 H15 L12 14 L9 21 H3 Z" fill="#ffffff"/>
+          </svg>
+        </div>
+        <div>
+          <div class="name">Algo<span class="accent">Rep</span></div>
+          <div class="tagline">LeetCode practice that compounds</div>
+        </div>
+      </div>
+
+      <h1 class="headline">
+        Sync solutions to GitHub<br />
+        with <span class="em">AI analysis</span> &amp; spaced repetition.
+      </h1>
+
+      <div class="features">
+        <span class="chip">Auto-commit</span>
+        <span class="chip chip-2">AI complexity</span>
+        <span class="chip chip-3">Spaced repetition</span>
+        <span class="chip chip-4">Study plans</span>
+      </div>
+
+      <div class="footer-mark">github.com/ameyrane98/AlgoRep</div>
+    </div>
+  </body>
+</html>
