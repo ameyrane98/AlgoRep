@@ -601,11 +601,14 @@ function loader(leetCode) {
         'Uploaded code'
       );
 
-      /* Group problem into its relevant topics */
+      /* Group problem into its relevant topics. A failure here must not block
+         submission tracking (the repo-level README is non-essential). */
       const updateRepoReadMe = updateReadmeTopicTagsWithProblem(
         leetCode.submissionData?.question?.topicTags,
         problemName
-      );
+      ).catch(e => {
+        console.log('Could not update repo README topic tags:', e?.message || e);
+      });
 
       // Wait for archive to finish before main uploads (to avoid SHA conflicts)
       if (archiveOldVersion) {
@@ -716,8 +719,9 @@ function loader(leetCode) {
       leetCode.markUploaded();
 
       if (!alreadyCompleted) {
-        // Increments local and persistent stats
-        incrementStats(leetCode.difficulty, problemName).then(setPersistentStats);
+        // stats.shas keys are full paths (groupName/primaryTopic/problemName).
+        const fullPath = `${groupName}/${primaryTopic}/${problemName}`;
+        incrementStats(leetCode.difficulty, fullPath).then(setPersistentStats);
       }
 
       // Reset attempt counter for next problem

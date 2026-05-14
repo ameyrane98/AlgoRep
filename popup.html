@@ -13,152 +13,208 @@
   </head>
 
   <body>
-    <div class="ui grid container">
-      <div class="sixteen wide center aligned column">
-        <h1 id="title">Algo<span style="color: #4cc9f0">Rep</span></h1>
-        <p id="caption">Your LeetCode learning system</p>
-        <br />
-        <!-- Authentication mode -->
-        <div id="auth_mode" hidden>
-          <p class="onboarding">
-            <br />
-            Authenticate with GitHub to use
-            <strong>Algo<span style="color: #4cc9f0">Rep</span></strong>
-          </p>
-          <button id="authenticate" class="ui secondary button">
-            <i class="icon github"></i>
-            Authenticate
-          </button>
+    <div class="app">
+      <!-- HEADER -->
+      <header class="app-header">
+        <h1 id="title">
+          <img src="assets/algorep-icon-48.png" alt="" class="brand-logo" />Algo<span class="title-accent">Rep</span>
+        </h1>
+        <div class="subtitle">
+          <a id="repo_url" target="_blank">—</a>
+          <span class="dot-sep">·</span>
+          <span id="streak_badge" class="streak-badge" title="Current streak">
+            <span class="streak-flame">&#x1F525;</span>
+            <span id="current_streak">0</span>d
+            <span class="streak-best">best <span id="longest_streak">0</span></span>
+          </span>
+          <button id="theme_toggle" class="theme-toggle" title="Toggle theme" aria-label="Toggle theme">&#x263D;</button>
+        </div>
+      </header>
+
+      <!-- AUTH MODE -->
+      <div id="auth_mode" class="centered-mode" hidden>
+        <p class="onboarding">
+          Authenticate with GitHub to use
+          <strong>Algo<span class="title-accent">Rep</span></strong>
+        </p>
+        <button id="authenticate" class="ui secondary button">
+          <i class="icon github"></i>
+          Authenticate
+        </button>
+      </div>
+
+      <!-- HOOK MODE -->
+      <div id="hook_mode" class="centered-mode" hidden>
+        <p class="onboarding">
+          Set up repository hook to use
+          <strong>Algo<span class="title-accent">Rep</span></strong>
+        </p>
+        <a id="hook_URL" href="" target="blank" class="ui secondary button">
+          <i class="icon github"></i>
+          Set up Hook
+        </a>
+      </div>
+
+      <!-- COMMIT MODE -->
+      <div id="commit_mode" hidden>
+        <!-- STATS STRIP -->
+        <div class="stats-strip">
+          <div class="stat">
+            <span class="stat-num" id="p_solved">0</span>
+            <span class="stat-label">Total</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num easy" id="p_solved_easy">0</span>
+            <span class="stat-label">Easy</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num medium" id="p_solved_medium">0</span>
+            <span class="stat-label">Med</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num hard" id="p_solved_hard">0</span>
+            <span class="stat-label">Hard</span>
+          </div>
         </div>
 
-        <!-- Repo Hook mode -->
-        <div id="hook_mode" hidden>
-          <p class="onboarding">
-            <br />
-            Set up repository hook to use
-            <strong>Algo<span style="color: #4cc9f0">Rep</span></strong>
-          </p>
-          <a id="hook_URL" href="" target="blank" class="ui secondary button">
-            <i class="icon github"></i>
-            Set up Hook
-          </a>
+        <!-- ROTATION NUDGE -->
+        <div id="rotation_nudge" class="rotation-nudge" hidden>
+          <span class="rotation-nudge-text"></span>
         </div>
 
-        <!-- Commit mode -->
-        <div id="commit_mode" hidden>
-          <p id="repo_url" class="ui small header"></p>
-
-          <!-- Streak Section -->
-          <div id="streak_section" class="popup-section">
-            <span id="streak_display" class="streak-badge">
-              <span class="streak-flame">&#x1F525;</span>
-              <span id="current_streak">0</span> day streak
-            </span>
-            <span class="streak-best">(best: <span id="longest_streak">0</span>)</span>
+        <!-- TODAY CARD (pinned) -->
+        <section class="card today-card">
+          <div class="card-header">
+            <span class="card-title">Today</span>
+            <span id="today_count" class="card-count">0</span>
+          </div>
+          <div id="today_list" class="today-list">
+            <div class="empty-state">No solves yet today — pick a problem and go.</div>
           </div>
 
-          <!-- Stats Section -->
-          <div class="popup-section">
-            <p class="onboarding">Problems Solved: <span id="p_solved">0</span></p>
-            <p class="ui small header">
-              <span style="color: #06d6a0">Easy:</span>
-              <span id="p_solved_easy" style="color: #e8e8e8; opacity: 0.75">0 </span>
-              <span style="color: #ffd166">&ensp; &ensp; Medium:</span>
-              <span id="p_solved_medium" style="color: #e8e8e8; opacity: 0.75">0 </span>
-              <span style="color: #ef476f">&ensp; &ensp; Hard:</span>
-              <span id="p_solved_hard" style="color: #e8e8e8; opacity: 0.75">0 </span>
-            </p>
-          </div>
-
-          <!-- Review Queue Section -->
-          <div id="review_section" class="popup-section" hidden>
-            <div class="section-header">
-              <span class="section-title">Review Due</span>
+          <div id="review_subsection" class="card-subsection" hidden>
+            <div class="subsection-header">
+              <span class="subsection-title">Review Due</span>
               <span id="review_count" class="review-badge">0</span>
             </div>
             <div id="review_list" class="review-list"></div>
           </div>
+        </section>
 
-          <!-- Topic Mastery Section -->
-          <div id="topics_section" class="popup-section" hidden>
-            <div class="section-header">
-              <span class="section-title">Topic Progress</span>
+        <!-- TABS -->
+        <nav class="tabs" role="tablist">
+          <button class="tab active" data-tab="patterns" role="tab" aria-selected="true">Patterns</button>
+          <button class="tab" data-tab="plan" role="tab" aria-selected="false">Study Plan</button>
+          <button class="tab" data-tab="ai" role="tab" aria-selected="false">AI</button>
+        </nav>
+
+        <!-- PATTERNS TAB -->
+        <section class="tab-panel active" data-panel="patterns" role="tabpanel">
+          <!-- Active Pattern card -->
+          <div id="active_pattern_card" class="active-pattern-card" hidden>
+            <span class="ap-icon">&#x1F3AF;</span>
+            <div class="ap-body">
+              <div class="ap-line">
+                <span class="ap-label">Active pattern</span>
+                <a id="active_pattern_link" href="#" target="_blank">—</a>
+              </div>
+              <div id="active_pattern_meta" class="ap-meta"></div>
             </div>
-            <div id="topics_list" class="topics-list"></div>
           </div>
 
-          <!-- Study Plan Section -->
-          <div id="study_plan_section" class="popup-section" hidden>
-            <div class="section-header">
-              <span class="section-title">Study Plan</span>
-              <select id="study_plan_select" class="plan-select">
-                <option value="blind75">Blind 75</option>
-                <option value="neetcode150">NeetCode 150</option>
-                <option value="grind75">Grind 75</option>
+          <!-- Weekly checklist -->
+          <div class="subhead">
+            <span class="subhead-title">This week</span>
+            <span id="weekly_patterns_count" class="subhead-count">0/0</span>
+          </div>
+          <div id="weekly_patterns_list" class="weekly-patterns-list"></div>
+          <div id="weekly_patterns_meta" class="weekly-patterns-meta"></div>
+
+          <!-- Activity -->
+          <div class="subhead with-toggle">
+            <span class="subhead-title">Activity</span>
+            <div class="period-toggle" role="tablist">
+              <button class="period-btn active" data-period="week">W</button>
+              <button class="period-btn" data-period="month">M</button>
+              <button class="period-btn" data-period="year">Y</button>
+            </div>
+          </div>
+          <div id="activity_chart" class="activity-chart"></div>
+          <div id="activity_detail" class="activity-detail"></div>
+
+          <!-- Topic mastery -->
+          <div class="subhead">
+            <span class="subhead-title">All-time topics</span>
+          </div>
+          <div id="topics_list" class="topics-list"></div>
+        </section>
+
+        <!-- STUDY PLAN TAB -->
+        <section class="tab-panel" data-panel="plan" role="tabpanel">
+          <div class="subhead with-toggle">
+            <span class="subhead-title">Study Plan</span>
+            <select id="study_plan_select" class="plan-select">
+              <option value="blind75">Blind 75</option>
+              <option value="neetcode150">NeetCode 150</option>
+              <option value="grind75">Grind 75</option>
+            </select>
+          </div>
+          <div class="plan-progress">
+            <div class="plan-progress-bar">
+              <div id="plan_progress_fill" class="plan-progress-fill"></div>
+            </div>
+            <span id="plan_progress_text" class="plan-progress-text">0/0</span>
+          </div>
+          <div id="plan_next_problem" class="plan-next"></div>
+
+          <div class="subhead">
+            <span class="subhead-title">Roadmap</span>
+            <span id="roadmap_hint" class="subhead-hint">Tap a node to expand</span>
+          </div>
+          <div id="roadmap_container" class="roadmap"></div>
+          <div id="roadmap_detail" class="roadmap-detail"></div>
+        </section>
+
+        <!-- AI TAB -->
+        <section class="tab-panel" data-panel="ai" role="tabpanel">
+          <div class="subhead with-toggle">
+            <span class="subhead-title">AI Analysis</span>
+            <span id="ai_status" class="ai-status"></span>
+          </div>
+          <div class="ai-info" id="ai_chrome_info">
+            Uses Chrome Built-in AI (free, on-device)
+          </div>
+          <details class="ai-fallback">
+            <summary class="ai-fallback-toggle">Optional: API Key</summary>
+            <div class="ai-key-form">
+              <select id="ai_provider" class="plan-select" style="width:100%;margin-bottom:4px;">
+                <option value="gemini">Gemini (free tier)</option>
+                <option value="openai">OpenAI</option>
               </select>
+              <input id="ai_key" type="password" placeholder="API key (optional)" class="ai-key-input" />
+              <button id="ai_save_key" type="button" class="ai-save-btn">Save</button>
             </div>
-            <div id="study_plan_progress" class="plan-progress">
-              <div class="plan-progress-bar">
-                <div id="plan_progress_fill" class="plan-progress-fill"></div>
-              </div>
-              <span id="plan_progress_text" class="plan-progress-text">0/0</span>
-            </div>
-            <div id="plan_next_problem" class="plan-next"></div>
-          </div>
+          </details>
+        </section>
 
-          <!-- AI Settings Section -->
-          <div id="ai_section" class="popup-section">
-            <div class="section-header">
-              <span class="section-title">AI Analysis</span>
-              <span id="ai_status" class="ai-status"></span>
-            </div>
-            <div id="ai_settings" class="ai-settings">
-              <div class="ai-info" id="ai_chrome_info">
-                Uses Chrome Built-in AI (free, on-device)
-              </div>
-              <div class="ai-fallback">
-                <details>
-                  <summary class="ai-fallback-toggle">Optional: API Key</summary>
-                  <div class="ai-key-form">
-                    <select id="ai_provider" class="plan-select" style="width:100%;margin-bottom:4px;">
-                      <option value="gemini">Gemini (free tier)</option>
-                      <option value="openai">OpenAI</option>
-                    </select>
-                    <input id="ai_key" type="password" placeholder="API key (optional)" class="ai-key-input" />
-                    <button id="ai_save_key" type="button" class="ai-save-btn">Save</button>
-                  </div>
-                </details>
-              </div>
-            </div>
-          </div>
-
+        <!-- FOOTER -->
+        <div class="app-footer">
           <button id="reset_stats" type="button">Reset all stats</button>
-          <div id="reset_confirmation" style="position:absolute; display:none; top:200px; left:50%; width:500px; margin-left:-250px; border:1px solid #2a2a4a; padding:20px; background-color:#0f3460; border-radius:8px;">
-            <p>Are you sure you want to delete your stats?</p>
-            <p>
-                <button id="reset_yes" type="button">
-                    Yes
-                </button>
-                <button id="reset_no" type="button">
-                    No
-                </button>
-            </p>
-          </div>
+          <a class="footer-link" target="_blank"
+            href="https://github.com/ameyrane98/LeetHub-2.0/labels/feature">Request a feature</a>
+        </div>
 
-          <div class="ui small header">
-            Want more features?
-            <a
-              style="color: #4cc9f0 !important"
-              target="_blank"
-              href="https://github.com/ameyrane98/LeetHub-2.0/labels/feature"
-              >Request a feature!</a
-            >
-          </div>
+        <div id="reset_confirmation" class="reset-modal" style="display:none;">
+          <p>Are you sure you want to delete your stats?</p>
+          <p>
+            <button id="reset_yes" type="button">Yes</button>
+            <button id="reset_no" type="button">No</button>
+          </p>
         </div>
       </div>
 
-      <!-- Generate Socials -->
-      <div id="socials" class="sixteen wide column">
+      <!-- Socials -->
+      <div id="socials">
         <a href="https://github.com/ameyrane98/LeetHub-2.0" target="_blank" aria-label="GitHub"
           ><i class="ui github icon"></i
         ></a>

@@ -1,142 +1,217 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8" />
     <link rel="stylesheet" href="css/welcome.css" />
-    <script
-      src="scripts/jquery-3.3.1.min.js"
-    ></script>
-
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"
-      rel="stylesheet"
-    />
-    <script src="scripts/semantic-2.4.1.min.js"></script>
+    <script src="scripts/jquery-3.3.1.min.js"></script>
   </head>
 
   <body>
-    <div class="ui grid container">
-      <div class="sixteen wide center aligned column">
-        <br />
-        <p class="caption" style="font-size: 9em">
-          Algo<span style="color: #4cc9f0">Rep</span>
-        </p>
-        <p class="caption">
-          Your AI-powered LeetCode learning system
-        </p>
-        <br /><br /><br /><br /><br /><br /><br /><br />
-        <p hidden id="error"></p>
-        <p hidden id="success"></p>
-        <p hidden id="unlink">
-          Linked the wrong repo? <a>Unlink</a>.
-        </p>
-      </div>
-
-      <!-- Create Hook -->
-      <div
-        style="display: none"
-        id="hook_mode"
-        class="ui grid container"
-      >
-        <div class="six wide column">
-          <p class="caption ui large header center aligned">
-            To get started with AlgoRep
-          </p>
+    <div class="page">
+      <!-- HEADER -->
+      <header class="dash-header">
+        <div class="brand brand-row">
+          <img src="assets/algorep-icon-128.png" alt="" class="brand-mark" />
+          <div>
+            <h1 class="brand-title">Algo<span class="brand-accent">Rep</span></h1>
+            <p class="brand-tagline">Your AI-powered LeetCode learning system</p>
+          </div>
         </div>
-        <div class="four wide left aligned column">
-          <div class="ui form">
-            <div class="field">
+        <div class="brand-meta" id="brand_meta">
+          <a id="repo_link" target="_blank" class="repo-link" hidden></a>
+          <span class="streak-pill" id="streak_pill" hidden>
+            <span class="streak-flame">&#x1F525;</span>
+            <span id="current_streak">0</span> day streak
+            <span class="streak-best">· best <span id="longest_streak">0</span></span>
+          </span>
+          <button id="unlink_btn" class="ghost-btn" hidden>Unlink repo</button>
+          <button id="theme_toggle" class="theme-toggle" title="Toggle theme" aria-label="Toggle theme">&#x263D;</button>
+        </div>
+      </header>
+
+      <!-- BANNERS -->
+      <p id="error_banner" class="banner banner-error" hidden></p>
+      <p id="success_banner" class="banner banner-success" hidden></p>
+
+      <!-- HOOK MODE: setup -->
+      <section id="hook_mode" class="setup" hidden>
+        <div class="setup-card">
+          <h2>Get started</h2>
+          <p class="setup-sub">Connect a GitHub repository to feed your AlgoRep dashboard.</p>
+
+          <div class="setup-form">
+            <label>
+              <span class="setup-label">Repository</span>
               <select id="type">
-                <option value="">Pick an Option</option>
-                <option value="new">
-                  Create a new Private Repository
-                </option>
-                <option value="link">
-                  Link an Existing Repository
-                </option>
+                <option value="">Pick an option</option>
+                <option value="new">Create a new private repository</option>
+                <option value="link">Link an existing repository</option>
+              </select>
+            </label>
+            <label>
+              <span class="setup-label">Name</span>
+              <input id="name" type="text" autocomplete="off" placeholder="e.g. LeetCodeGrind" />
+            </label>
+            <button id="hook_button" class="primary-btn" disabled>Get started</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- COMMIT MODE: dashboard -->
+      <main id="commit_mode" class="dash" hidden>
+        <!-- Stats strip -->
+        <section class="stats-strip card">
+          <div class="stat">
+            <span class="stat-num" id="p_solved">0</span>
+            <span class="stat-label">Total</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num easy" id="p_solved_easy">0</span>
+            <span class="stat-label">Easy</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num medium" id="p_solved_medium">0</span>
+            <span class="stat-label">Medium</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num hard" id="p_solved_hard">0</span>
+            <span class="stat-label">Hard</span>
+          </div>
+          <div class="stat" id="week_stat">
+            <span class="stat-num" id="week_count">0</span>
+            <span class="stat-label">This week</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num" id="today_count_top">0</span>
+            <span class="stat-label">Today</span>
+          </div>
+        </section>
+
+        <!-- Rotation nudge -->
+        <div id="rotation_nudge" class="rotation-nudge" hidden>
+          <span class="rotation-nudge-text"></span>
+        </div>
+
+        <!-- Row: Activity + Today + Review -->
+        <section class="grid-row row-activity">
+          <div class="card span-8">
+            <div class="card-header">
+              <h3 class="card-title">Activity</h3>
+              <div class="period-toggle" role="tablist">
+                <button class="period-btn active" data-period="week">Week</button>
+                <button class="period-btn" data-period="month">Month</button>
+                <button class="period-btn" data-period="year">Year</button>
+              </div>
+            </div>
+            <div id="activity_chart" class="activity-chart"></div>
+            <div id="activity_detail" class="activity-detail"></div>
+          </div>
+
+          <div class="card span-4 stack">
+            <div class="stack-block">
+              <div class="card-header">
+                <h3 class="card-title">Today</h3>
+                <span class="card-count" id="today_count">0</span>
+              </div>
+              <div id="today_list" class="today-list">
+                <div class="empty-state">No solves yet today — pick a problem and go.</div>
+              </div>
+            </div>
+            <div id="review_subsection" class="stack-block" hidden>
+              <div class="card-header">
+                <h3 class="card-title sub">Review Due</h3>
+                <span class="review-badge" id="review_count">0</span>
+              </div>
+              <div id="review_list" class="review-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Row: Patterns + Study Plan/Roadmap -->
+        <section class="grid-row">
+          <div class="card span-6">
+            <div class="card-header">
+              <h3 class="card-title">Patterns</h3>
+              <span class="card-count" id="weekly_patterns_count">0/0</span>
+            </div>
+
+            <div id="active_pattern_card" class="active-pattern-card" hidden>
+              <span class="ap-icon">&#x1F3AF;</span>
+              <div class="ap-body">
+                <div class="ap-line">
+                  <span class="ap-label">Active</span>
+                  <a id="active_pattern_link" href="#" target="_blank">—</a>
+                </div>
+                <div id="active_pattern_meta" class="ap-meta"></div>
+              </div>
+            </div>
+
+            <div id="weekly_patterns_list" class="weekly-patterns-list"></div>
+            <div id="weekly_patterns_meta" class="weekly-patterns-meta"></div>
+          </div>
+
+          <div class="card span-6">
+            <div class="card-header">
+              <h3 class="card-title">Study Plan</h3>
+              <select id="study_plan_select" class="plan-select">
+                <option value="blind75">Blind 75</option>
+                <option value="neetcode150">NeetCode 150</option>
+                <option value="grind75">Grind 75</option>
               </select>
             </div>
-          </div>
-        </div>
-        <div class="six wide column">
-          <div class="ui form">
-            <div class="field">
-              <input
-                autocomplete="off"
-                id="name"
-                placeholder="Repository Name"
-                type="text"
-              />
+            <div class="plan-progress">
+              <div class="plan-progress-bar">
+                <div id="plan_progress_fill" class="plan-progress-fill"></div>
+              </div>
+              <span id="plan_progress_text" class="plan-progress-text">0/0</span>
             </div>
-          </div>
-        </div>
+            <div id="plan_next_problem" class="plan-next"></div>
 
-        <div class="sixteen wide right aligned column">
-          <br />
-          <button
-            id="hook_button"
-            disabled
-            class="positive ui button"
-          >
-            Get Started
-          </button>
-        </div>
-      </div>
+            <div class="subhead">
+              <span class="subhead-title">Roadmap</span>
+              <span class="subhead-hint">Tap a node to expand</span>
+            </div>
+            <div id="roadmap_container" class="roadmap"></div>
+            <div id="roadmap_detail" class="roadmap-detail"></div>
+          </div>
+        </section>
 
-      <!-- Show stats -->
-      <div
-        style="display: none"
-        id="commit_mode"
-        class="ui grid container"
-      >
-        <div class="eight wide center aligned column">
-          <br /><br />
-          <div
-            style="font-size: 2.3em"
-            class="ui inverted large header"
-          >
-            Problems Solved: <span id="p_solved">0</span>
+        <!-- Row: Topic Mastery + AI -->
+        <section class="grid-row">
+          <div class="card span-8">
+            <div class="card-header">
+              <h3 class="card-title">All-time topic coverage</h3>
+            </div>
+            <div id="topics_list" class="topics-list"></div>
           </div>
-          <div
-            style="font-size: 2.3em"
-            class="ui inverted large header"
-          >
-            <span style="color: #06d6a0">Easy:</span>
-            <span id="p_solved_easy" style="color: #06d6a0">0 </span>
-            <span style="color: #ffd166">&ensp; &ensp; Medium:</span>
-            <span id="p_solved_medium" style="color: #ffd166"
-              >0
-            </span>
-            <span style="color: #ef476f">&ensp; &ensp; Hard:</span>
-            <span id="p_solved_hard" style="color: #ef476f">0 </span>
-          </div>
-        </div>
-        <div class="eight wide center aligned column">
-          <br /><br /><br />
-          <div class="ui inverted large header">
-            Want more features? <br /><a
-              style="color: #4cc9f0 !important; font-size: 0.8em"
-              target="_blank"
-              href="https://github.com/ameyrane98/LeetHub-2.0/labels/feature"
-              >Request a feature!</a
-            >
-          </div>
-        </div>
-      </div>
 
-      <!-- Rate on GitHub -->
-      <div class="sixteen wide right aligned column">
-        <br /><br /><br /><br /><br />
-        <div class="ui inverted small header">
-          <a
-            style="color: #4cc9f0 !important"
-            target="_blank"
-            href="https://github.com/ameyrane98/LeetHub-2.0"
-            >Star <span style="color: #e8e8e8">Algo</span
-            ><span style="color: #4cc9f0 !important">Rep</span> on
-            GitHub</a
-          >
-        </div>
-      </div>
+          <div class="card span-4">
+            <div class="card-header">
+              <h3 class="card-title">AI Analysis</h3>
+              <span id="ai_status" class="ai-status"></span>
+            </div>
+            <p class="ai-info" id="ai_chrome_info">Uses Chrome Built-in AI (free, on-device)</p>
+            <details class="ai-fallback">
+              <summary class="ai-fallback-toggle">Optional: API Key</summary>
+              <div class="ai-key-form">
+                <select id="ai_provider" class="plan-select">
+                  <option value="gemini">Gemini (free tier)</option>
+                  <option value="openai">OpenAI</option>
+                </select>
+                <input id="ai_key" type="password" placeholder="API key (optional)" class="ai-key-input" />
+                <button id="ai_save_key" type="button" class="primary-btn small">Save</button>
+              </div>
+            </details>
+          </div>
+        </section>
+      </main>
+
+      <footer class="dash-footer">
+        <a href="https://github.com/ameyrane98/LeetHub-2.0" target="_blank">
+          Star <span class="brand-mini">Algo<span class="brand-accent">Rep</span></span> on GitHub
+        </a>
+        <a class="ghost-link" href="https://github.com/ameyrane98/LeetHub-2.0/labels/feature" target="_blank">Request a feature</a>
+      </footer>
     </div>
 
     <script type="text/javascript" src="scripts/welcome.js"></script>

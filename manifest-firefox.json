@@ -6,14 +6,18 @@
   "version": "__LH_VERSION__",
   "author": "Amey Rane",
   "action": {
-    "default_icon": "assets/thumbnail.png",
+    "default_icon": {
+      "16": "assets/algorep-icon-16.png",
+      "48": "assets/algorep-icon-48.png",
+      "128": "assets/algorep-icon-128.png"
+    },
     "default_popup": "popup.html",
     "default_title": "AlgoRep - Your LeetCode learning system"
   },
   "icons": {
-    "16": "assets/thumbnail.png",
-    "48": "assets/thumbnail.png",
-    "128": "assets/thumbnail.png"
+    "16": "assets/algorep-icon-16.png",
+    "48": "assets/algorep-icon-48.png",
+    "128": "assets/algorep-icon-128.png"
   },
   "background": {
     "scripts": ["scripts/background.js"]
