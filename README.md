@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="assets/upload_icon.svg" alt="AlgoRep Logo" width="128">
+  <img src="assets/algorep-logo.svg" alt="AlgoRep Logo" width="128">
   <br>
   AlgoRep
   <br>
