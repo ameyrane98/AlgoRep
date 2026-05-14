@@ -28,7 +28,7 @@ const updateStatsMsg = 'Updated stats';
 const discussionMsg = 'Prepend discussion post - AlgoRep';
 const createNotesMsg = 'Attach NOTES - AlgoRep';
 const defaultRepoReadme =
-  'A collection of LeetCode solutions with AI analysis and spaced repetition tracking - Created using [AlgoRep](https://github.com/ameyrane98/LeetHub-2.0)';
+  'A collection of LeetCode solutions with AI analysis and spaced repetition tracking - Created using [AlgoRep](https://github.com/ameyrane98/AlgoRep)';
 const readmeFilename = 'README.md';
 const statsFilename = 'stats.json';
 
@@ -842,8 +842,8 @@ submitBtnObserver.observe(document.body, {
 api.storage.local.get('isSync', data => {
   const keys = [
     'algorep_token',
-    'leethub_username',
-    'pipe_leethub',
+    'algorep_username',
+    'pipe_algorep',
     'stats',
     'algorep_hook',
     'mode_type',

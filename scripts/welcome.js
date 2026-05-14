@@ -19,7 +19,7 @@ import { backfillFromRepo } from './leetcode/repoBackfill.js';
 const api = getBrowser();
 
 const createRepoDescription =
-  'A collection of LeetCode questions to ace the coding interview! - Created using [AlgoRep](https://github.com/ameyrane98/LeetHub-2.0)';
+  'A collection of LeetCode questions to ace the coding interview! - Created using [AlgoRep](https://github.com/ameyrane98/AlgoRep)';
 
 // ============================================================
 // Setup / hook flow (kept compatible with prior behaviour)

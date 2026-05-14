@@ -53,7 +53,7 @@ function isEmptyObject(obj) {
 
 function assert(truthy, msg) {
   if (!truthy) {
-    throw new LeetHubError(msg);
+    throw new AlgoRepError(msg);
   }
 }
 
@@ -104,7 +104,7 @@ function getBrowser() {
   } else if (typeof browser !== 'undefined' && typeof browser.runtime !== 'undefined') {
     return browser;
   } else {
-    throw new LeetHubError('BrowserNotSupported');
+    throw new AlgoRepError('BrowserNotSupported');
   }
 }
 
